@@ -7,3 +7,4 @@ release
 *.txt
 *.log
 go.sum
+build

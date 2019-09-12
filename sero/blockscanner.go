@@ -236,6 +236,14 @@ func (bs *SEROBlockScanner) BatchExtractTransactions(block *BlockData) error {
 		return nil
 	}
 
+	//先作废已使用的utxo
+	for _, nilKey := range block.blockInfo.Nils {
+		nilErr := bs.DeleteUnspent(nilKey)
+		if nilErr != nil {
+			return nilErr
+		}
+	}
+
 	bs.wm.Log.Std.Info("block scanner ready extract transactions total: %d ", len(block.transactions))
 
 	//生产通道
@@ -300,14 +308,6 @@ func (bs *SEROBlockScanner) BatchExtractTransactions(block *BlockData) error {
 
 	if failed > 0 {
 		return fmt.Errorf("block scanner saveWork failed")
-	}
-
-	//作废已使用的utxo
-	for _, nilKey := range block.blockInfo.Nils {
-		nilErr := bs.DeleteUnspent(nilKey)
-		if nilErr != nil {
-			return nilErr
-		}
 	}
 
 	return nil

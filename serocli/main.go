@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/blocktree/go-openw-cli/commands"
+	"github.com/blocktree/sero-adapter/serocli/commands"
 	"gopkg.in/urfave/cli.v1"
 	"os"
 	"path/filepath"

@@ -37,9 +37,9 @@ func init() {
 }
 
 // LoadSEROConfig 加载sero-adapter的配置
-func LoadSEROConfig(path string) error {
+func LoadSEROConfig() error {
 
-	c, err := config.NewConfig("ini", path)
+	c, err := config.NewConfig("ini", "SERO.ini")
 	if err != nil {
 		return err
 	}

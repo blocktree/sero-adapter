@@ -196,7 +196,6 @@ func getCLI(c *cli.Context) *openwcli.CLI {
 		err error
 	)
 
-	serocfg := c.GlobalString("serocfg")
 	conf := c.GlobalString("conf")
 	config, err := openwcli.LoadConfig(conf)
 	if err != nil {
@@ -205,7 +204,7 @@ func getCLI(c *cli.Context) *openwcli.CLI {
 	}
 
 	//加载SERO配置
-	err = LoadSEROConfig(serocfg)
+	err = LoadSEROConfig()
 	if err != nil {
 		log.Error("unexpected error: ", err)
 		return nil

@@ -18,7 +18,6 @@ func getTestOpenwCLI() *openwcli.CLI {
 	confFile := filepath.Join("conf", "test.ini")
 	//confFile := filepath.Join("conf", "prod.ini")
 
-	serocfg := filepath.Join("conf", "SERO.ini")
 	config, err := openwcli.LoadConfig(confFile)
 	if err != nil {
 		log.Error("unexpected error: ", err)
@@ -26,7 +25,7 @@ func getTestOpenwCLI() *openwcli.CLI {
 	}
 
 	//加载SERO配置
-	err = LoadSEROConfig(serocfg)
+	err = LoadSEROConfig()
 	if err != nil {
 		log.Error("unexpected error: ", err)
 		return nil
@@ -81,7 +80,8 @@ func TestCLI_CreateAccountOnServer(t *testing.T) {
 	if cli == nil {
 		return
 	}
-	walletID := "WFXjcUJXsDB3uBxa8fbr8xqThUeVNtzMbs"
+	//walletID := "WFXjcUJXsDB3uBxa8fbr8xqThUeVNtzMbs"
+	walletID := "WFXtudgu9Q5ktpcfDPC8gVEbHF1t1QWiVV"
 	wallet, err := cli.GetWalletByWalletID(walletID)
 	if err != nil {
 		log.Error("GetWalletByWalletID error:", err)
@@ -89,10 +89,28 @@ func TestCLI_CreateAccountOnServer(t *testing.T) {
 	}
 
 	if wallet != nil {
-		_, _, err = SERO_CreateAccountOnServer(cli, "mainnetSERO", "12345678", "SERO", wallet)
+		_, _, err = SERO_CreateAccountOnServer(cli, "mainnetSERO_1", "12345678", "SERO", wallet)
 		if err != nil {
 			log.Error("CreateAccountOnServer error:", err)
 			return
 		}
+	}
+}
+
+func TestCLI_GetAccountsOnServer(t *testing.T) {
+	cli := getTestOpenwCLI()
+	if cli == nil {
+		return
+	}
+
+	//walletID := "WFXjcUJXsDB3uBxa8fbr8xqThUeVNtzMbs"
+	walletID := "WFXtudgu9Q5ktpcfDPC8gVEbHF1t1QWiVV"
+	accounts, err := cli.GetAccountsOnServer(walletID)
+	if err != nil {
+		log.Error("GetAccountsOnServer error:", err)
+		return
+	}
+	for i, w := range accounts {
+		log.Info("account[", i, "]:", w)
 	}
 }

@@ -92,7 +92,7 @@ func TestSubscribeAddress(t *testing.T) {
 	}
 
 	scanner := assetsMgr.GetBlockScanner()
-	scanner.SetRescanBlockHeight(1632270)
+	scanner.SetRescanBlockHeight(1633006)
 	//scanner.SetRescanBlockHeight(1613221)
 
 	if scanner == nil {
