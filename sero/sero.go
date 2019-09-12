@@ -72,7 +72,6 @@ func (wm *WalletManager) LoadAssetsConfig(c config.Configer) error {
 
 	wm.Config.ServerAPI = c.String("serverAPI")
 	wm.Config.FixGas, _ = c.Int64("fixGas")
-	wm.Config.ChainID = c.String("chainID")
 	wm.WalletClient = client.NewClient(wm.Config.ServerAPI, false)
 	wm.Config.DataDir = c.String("dataDir")
 

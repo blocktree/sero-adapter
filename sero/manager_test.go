@@ -28,7 +28,6 @@ import (
 	"testing"
 )
 
-
 var (
 	tw *WalletManager
 )
@@ -52,7 +51,6 @@ func testNewWalletManager() *WalletManager {
 	wm.WalletClient.Debug = true
 	return wm
 }
-
 
 func testGetLocalKeyByKeyID(keyID string) *hdkeystore.HDKey {
 
@@ -120,19 +118,19 @@ func TestWalletManager_CreateAccount(t *testing.T) {
 	log.Infof("account: %+v", account)
 
 	/*
-	{
-	WalletID:W3KUZGQqWYmPUanYfHth5A4tMuuZ2Uo7t5
-	Alias:sero
-	AccountID:5tb3GBhJks3QMpPsPVabRQG4ZuhjorGZvooQhif2uRcbwJq5ZsXpCFc78hEU9Wom38MrFqQbu7SXWG7foGYt7JV6
-	Index:0 HDPath:m/44'/88'/0'
-	PublicKey:5tb3GBhJks3QMpPsPVabRQG4ZuhjorGZvooQhif2uRcc2QFvRZmxxsotxNkMjmgCyMFVpnFcgmfLfGudUDyV9ts8
-	OwnerKeys:[]
-	ContractAddress:
-	Required:1 Symbol:SERO
-	AddressIndex:-1
-	Balance: IsTrust:false
-	ExtParam: ModelType:0 core:<nil>}
-	 */
+		{
+		WalletID:W3KUZGQqWYmPUanYfHth5A4tMuuZ2Uo7t5
+		Alias:sero
+		AccountID:5tb3GBhJks3QMpPsPVabRQG4ZuhjorGZvooQhif2uRcbwJq5ZsXpCFc78hEU9Wom38MrFqQbu7SXWG7foGYt7JV6
+		Index:0 HDPath:m/44'/88'/0'
+		PublicKey:5tb3GBhJks3QMpPsPVabRQG4ZuhjorGZvooQhif2uRcc2QFvRZmxxsotxNkMjmgCyMFVpnFcgmfLfGudUDyV9ts8
+		OwnerKeys:[]
+		ContractAddress:
+		Required:1 Symbol:SERO
+		AddressIndex:-1
+		Balance: IsTrust:false
+		ExtParam: ModelType:0 core:<nil>}
+	*/
 }
 
 func TestWalletManager_CreateAddress(t *testing.T) {
@@ -171,4 +169,30 @@ func TestWalletManager_Seed2Sk(t *testing.T) {
 		return
 	}
 	log.Infof("sk: %s", sk)
+}
+
+func TestWalletManager_ListUnspent(t *testing.T) {
+	tk := "4gbLYX9shEoABGKaZrbTmAfHRXPKkVK6wudFEp7miNFZ7F9ZCL6t38Nr6tSr8GDS11tNZn7iwghsbt2qs6P1bkje"
+	currency := "SERO"
+	unspent, err := tw.ListUnspent(tk, currency, 0, -1)
+	if err != nil {
+		t.Errorf("ListUnspent failed, error: %v", err)
+		return
+	}
+	for _, utxo := range unspent {
+		log.Infof("utxo = %+v", utxo)
+	}
+}
+
+func TestWalletManager_ListUnspentByAddress(t *testing.T) {
+	address := "GUZ3K7iLmyuUnV4sGMZDG5E5GXd9dPanhHGAmxNnKVjfn9JvkMSPmm5PWXpmXjjhE2uzAWVaoPApqsLcqi9iawwinuoDp68vWC9Z4FPjpDMV4jVWL1kbVWLEAL6tzcN3gbv"
+	currency := "SERO"
+	unspent, err := tw.ListUnspentByAddress(address, currency, 0, -1)
+	if err != nil {
+		t.Errorf("ListUnspent failed, error: %v", err)
+		return
+	}
+	for _, utxo := range unspent {
+		log.Infof("utxo = %+v", utxo)
+	}
 }

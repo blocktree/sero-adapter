@@ -16,7 +16,6 @@
 package sero
 
 import (
-	"encoding/hex"
 	"fmt"
 	"github.com/blocktree/openwallet/openwallet"
 	"github.com/mr-tron/base58"
@@ -159,8 +158,10 @@ func (bs *SEROBlockScanner) ScanBlockTask() {
 
 			//删除上一区块链的所有充值记录
 			//bs.DeleteRechargesByHeight(currentHeight - 1)
-			//删除上一区块链的未扫记录
+			//删除上一区块的未扫记录
 			bs.DeleteUnscanRecord(currentHeight - 1)
+			//删除上一区块的未花记录
+			bs.DeleteUnspentByHeight(currentHeight - 1)
 			currentHeight = currentHeight - 2 //倒退2个区块重新扫描
 			if currentHeight <= 0 {
 				currentHeight = 1
@@ -303,7 +304,7 @@ func (bs *SEROBlockScanner) BatchExtractTransactions(block *BlockData) error {
 
 	//作废已使用的utxo
 	for _, nilKey := range block.blockInfo.Nils {
-		nilErr := bs.DeleteUnspent(hex.EncodeToString(nilKey[:]))
+		nilErr := bs.DeleteUnspent(nilKey)
 		if nilErr != nil {
 			return nilErr
 		}
@@ -387,6 +388,12 @@ func (bs *SEROBlockScanner) extractTransaction(block *BlockData, trx *gjson.Resu
 	}
 
 	for token, sourceExtractOutput := range tokenExtractOutput {
+
+		tokenFees := decimal.Zero
+		if token == bs.wm.Symbol() {
+			tokenFees = fees
+		}
+
 		for sourceKey, extractOutput := range sourceExtractOutput {
 			var (
 				to     = make([]string, 0)
@@ -405,7 +412,7 @@ func (bs *SEROBlockScanner) extractTransaction(block *BlockData, trx *gjson.Resu
 			tx := &openwallet.Transaction{
 				From:        []string{},
 				To:          to,
-				Fees:        fees.String(),
+				Fees:        tokenFees.String(),
 				Coin:        coin,
 				BlockHash:   block.BlockHash,
 				BlockHeight: block.BlockNumber,
@@ -445,6 +452,12 @@ func (bs *SEROBlockScanner) extractTransaction(block *BlockData, trx *gjson.Resu
 	}
 
 	for token, sourceExtractInput := range tokenExtractInput {
+
+		tokenFees := decimal.Zero
+		if token == bs.wm.Symbol() {
+			tokenFees = fees
+		}
+
 		for sourceKey, extractInput := range sourceExtractInput {
 			var (
 				from   = make([]string, 0)
@@ -478,7 +491,7 @@ func (bs *SEROBlockScanner) extractTransaction(block *BlockData, trx *gjson.Resu
 				extractData.Transaction = &openwallet.Transaction{
 					From:        from,
 					To:          []string{},
-					Fees:        fees.String(),
+					Fees:        tokenFees.String(),
 					Coin:        coin,
 					BlockHash:   block.BlockHash,
 					BlockHeight: block.BlockNumber,
@@ -622,9 +635,17 @@ func (bs *SEROBlockScanner) extractTxOutput(block *BlockData, trx *gjson.Result,
 	for i, out := range vout {
 
 		if out.State.OS.Out_Z != nil {
-			address = base58.Encode(out.State.OS.Out_Z.PKr[:])
+			addr, err := hexutil.Decode(out.State.OS.Out_Z.PKr)
+			if err != nil {
+				return nil, isTokenTrasfer, err
+			}
+			address = base58.Encode(addr)
 		} else if out.State.OS.Out_O != nil {
-			address = base58.Encode(out.State.OS.Out_O.Addr[:])
+			addr, err := hexutil.Decode(out.State.OS.Out_O.Addr)
+			if err != nil {
+				return nil, isTokenTrasfer, err
+			}
+			address = base58.Encode(addr)
 		} else {
 			continue
 		}
@@ -655,7 +676,7 @@ func (bs *SEROBlockScanner) extractTxOutput(block *BlockData, trx *gjson.Result,
 				return nil, isTokenTrasfer, err
 			}
 
-			amount := decimal.NewFromBigInt(tdOut.Asset.Tkn.Value.ToInt(), 0)
+			amount, _ := decimal.NewFromString(tdOut.Asset.Tkn.Value)
 			value := amount
 			outPut := openwallet.TxOutPut{}
 			contractId := openwallet.GenContractID(bs.wm.Symbol(), currency)
@@ -705,20 +726,16 @@ func (bs *SEROBlockScanner) extractTxOutput(block *BlockData, trx *gjson.Result,
 
 			//新增utxo
 			utxo := &Unspent{
-				Root:     hex.EncodeToString(out.Root[:]),
+				Height:   block.BlockNumber,
+				Root:     out.Root,
 				Address:  address,
 				TK:       sourceKey,
 				Currency: currency,
 				Value:    value.String(),
 			}
 
-			nilkeys := make([][]byte, 0)
-			for _, nilkey := range tdOut.Nils {
-				nilkeys = append(nilkeys, nilkey[:])
-			}
-
 			//保存新的utxo记录
-			err = bs.SaveUnspent(utxo, nilkeys)
+			err = bs.SaveUnspent(utxo, tdOut.Nils)
 			if err != nil {
 				return nil, isTokenTrasfer, fmt.Errorf("save unspent failed")
 			}
@@ -830,6 +847,29 @@ func (bs *SEROBlockScanner) GetScannedBlockHeight() uint64 {
 func (bs *SEROBlockScanner) GetBalanceByAddress(address ...string) ([]*openwallet.Balance, error) {
 
 	addrBalanceArr := make([]*openwallet.Balance, 0)
+
+	for _, addr := range address {
+		utxo, err := bs.wm.ListUnspentByAddress(addr, bs.wm.Symbol(), 0, -1)
+		if err != nil {
+			return nil, nil
+		}
+
+		obj := &openwallet.Balance{}
+		tb := decimal.Zero
+		for _, u := range utxo {
+
+			b, _ := decimal.NewFromString(u.Value)
+			tb = tb.Add(b.Shift(-bs.wm.Decimal()))
+
+		}
+
+		obj.Symbol = bs.wm.Symbol()
+		obj.Address = addr
+		obj.ConfirmBalance = tb.String()
+		obj.Balance = obj.ConfirmBalance
+
+		addrBalanceArr = append(addrBalanceArr, obj)
+	}
 
 	return addrBalanceArr, nil
 }

@@ -57,7 +57,7 @@ func (block *BlockData) GetOutputInfoByTxID(txid string) []Out {
 	output := make([]Out, 0)
 	if block.blockInfo != nil {
 		for _, info := range block.blockInfo.Outs {
-			id := hexutil.Encode(info.State.TxHash[:])
+			id := info.State.TxHash
 			if id == txid {
 				output = append(output, info)
 			}
@@ -101,6 +101,7 @@ func NewUnscanRecord(height uint64, txID, reason string) *UnscanRecord {
 //Unspent 未花记录
 type Unspent struct {
 	Root     string `json:"root" storm:"id"`
+	Height   uint64 `json:"height" storm:"index"`
 	Currency string `json:"currency"`
 	Value    string `json:"value"`
 	Address  string `json:"address" storm:"index"`
@@ -118,6 +119,7 @@ func NewUnspent(json *gjson.Result) *Unspent {
 	obj.Value = gjson.Get(json.Raw, "value").String()
 	obj.TK = gjson.Get(json.Raw, "tk").String()
 	obj.Sending = gjson.Get(json.Raw, "sending").Bool()
+	obj.Height = gjson.Get(json.Raw, "height").Uint()
 
 	return obj
 }
@@ -129,41 +131,43 @@ type Nil struct {
 }
 
 type Out struct {
-	Root  Uint256
+	Root  string
 	State RootState
 }
 
 type RootState struct {
 	OS     OutState
-	TxHash Uint256
+	TxHash string
 	Num    uint64
 }
 
 type OutState struct {
 	Index  uint64
-	Out_O  *Out_O   `rlp:"nil"`
-	Out_Z  *Out_Z   `rlp:"nil"`
-	OutCM  *Uint256 `rlp:"nil"`
-	RootCM *Uint256 `rlp:"nil"`
+	Out_O  *Out_O `rlp:"nil"`
+	Out_Z  *Out_Z `rlp:"nil"`
+	OutCM  *string
+	RootCM *string
 }
 
 type Out_O struct {
-	Addr  PKr
+	Addr  string
 	Asset Asset
-	Memo  Uint512
+	Memo  string
 }
 
 type Out_Z struct {
-	AssetCM Uint256
-	OutCM   Uint256
-	RPK     Uint256
-	PKr     PKr
+	AssetCM string
+	OutCM   string
+	RPK     string
+	EInfo   string
+	PKr     string
+	Proof   string
 }
 
 type TDOut struct {
 	Asset Asset
-	Memo  Uint512
-	Nils  []Uint256
+	Memo  string
+	Nils  []string
 }
 
 type DOut struct {
@@ -173,10 +177,10 @@ type DOut struct {
 }
 
 type Block struct {
-	Num  hexutil.Uint64
-	Hash Uint256
+	Num  string
+	Hash string
 	Outs []Out
-	Nils []Uint256
+	Nils []string
 }
 
 type Asset struct {
@@ -184,8 +188,8 @@ type Asset struct {
 }
 
 type Token struct {
-	Currency Uint256
-	Value    U256
+	Currency string
+	Value    string
 }
 
 type Uint256 [32]byte

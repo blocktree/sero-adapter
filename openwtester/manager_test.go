@@ -1,17 +1,20 @@
 package openwtester
 
 import (
+	"fmt"
 	"github.com/blocktree/openwallet/log"
 	"github.com/blocktree/openwallet/openw"
 	"github.com/blocktree/openwallet/openwallet"
-	"path/filepath"
 	"testing"
 )
 
 var (
-	testApp        = "sero-adapter"
-	configFilePath = filepath.Join("conf")
+	tw *openw.WalletManager
 )
+
+func init() {
+	tw = testInitWalletManager()
+}
 
 func testInitWalletManager() *openw.WalletManager {
 	log.SetLogFuncCall(true)
@@ -44,7 +47,7 @@ func TestWalletManager_GetWalletInfo(t *testing.T) {
 
 	tm := testInitWalletManager()
 
-	wallet, err := tm.GetWalletInfo(testApp, "W7tue6SDce38fPwerdKqyebUh6yo2nTQLC")
+	wallet, err := tm.GetWalletInfo(testApp, "W3TuDqe8VShgyPcg2dw4FRrNQbmxxiGPTJ")
 	if err != nil {
 		log.Error("unexpected error:", err)
 		return
@@ -73,9 +76,9 @@ func TestWalletManager_CreateAssetsAccount(t *testing.T) {
 
 	tm := testInitWalletManager()
 
-	walletID := "WKFkmvsSFz5mC1cAX3edJC2e6hH6ow3X9E"
+	walletID := "W3TuDqe8VShgyPcg2dw4FRrNQbmxxiGPTJ"
 	account := &openwallet.AssetsAccount{Alias: "mainnetSERO", WalletID: walletID, Required: 1, Symbol: "SERO", IsTrust: true}
-	account, address, err := tm.CreateAssetsAccount(testApp, walletID, "12345678", account, nil)
+	account, address, err := SERO_CreateAssetsAccount(testApp, walletID, "12345678", account, tm)
 	if err != nil {
 		log.Error(err)
 		return
@@ -91,7 +94,7 @@ func TestWalletManager_GetAssetsAccountList(t *testing.T) {
 
 	tm := testInitWalletManager()
 
-	walletID := "WKFkmvsSFz5mC1cAX3edJC2e6hH6ow3X9E"
+	walletID := "W3TuDqe8VShgyPcg2dw4FRrNQbmxxiGPTJ"
 	list, err := tm.GetAssetsAccountList(testApp, walletID, 0, 10000000)
 	if err != nil {
 		log.Error("unexpected error:", err)
@@ -111,7 +114,8 @@ func TestWalletManager_CreateAddress(t *testing.T) {
 	tm := testInitWalletManager()
 
 	walletID := "WKFkmvsSFz5mC1cAX3edJC2e6hH6ow3X9E"
-	accountID := "4h4wnCmpzgy3ZTeoMHs3gjDCuWyXQcxDsk9dcwbNGhmR"
+	//accountID := "4gbLYX9shEoABGKaZrbTmAfHRXPKkVK6wudFEp7miNFZ7F9ZCL6t38Nr6tSr8GDS11tNZn7iwghsbt2qs6P1bkje"
+	accountID := "3D58HdM35ZJrMgAzzRduGy6mPVqc8yeGNFm5kNBU16tZYkf84N9C4uppHtJWfw6bEXMtkFgXTxPnw3kN9m7QhiX2"
 	address, err := tm.CreateAddress(testApp, walletID, accountID, 300)
 	if err != nil {
 		log.Error(err)
@@ -130,16 +134,16 @@ func TestWalletManager_GetAddressList(t *testing.T) {
 
 	tm := testInitWalletManager()
 
-	walletID := "WKFkmvsSFz5mC1cAX3edJC2e6hH6ow3X9E"
-	//accountID := "HX4tUVg5eETb6SvZeGeAFwk4PQ1CWS6dQeyjj3CqfYyK"
-	accountID := "4h4wnCmpzgy3ZTeoMHs3gjDCuWyXQcxDsk9dcwbNGhmR"
+	walletID := "W3TuDqe8VShgyPcg2dw4FRrNQbmxxiGPTJ"
+	accountID := "3D58HdM35ZJrMgAzzRduGy6mPVqc8yeGNFm5kNBU16tZYkf84N9C4uppHtJWfw6bEXMtkFgXTxPnw3kN9m7QhiX2"
 	list, err := tm.GetAddressList(testApp, walletID, accountID, 0, -1, false)
 	if err != nil {
 		log.Error("unexpected error:", err)
 		return
 	}
-	for i, w := range list {
-		log.Info("address[", i, "] :", w.Address)
+	for _, w := range list {
+		fmt.Println(w.Address)
+		//log.Info("account[", i, "] :", w.AccountID)
 		//log.Info("address[", i, "] :", w.PublicKey)
 	}
 	log.Info("address count:", len(list))

@@ -104,12 +104,11 @@ func TestWalletManager_GetTransactionByWxID(t *testing.T) {
 }
 
 func TestWalletManager_GetAssetsAccountBalance(t *testing.T) {
-	tm := testInitWalletManager()
-	walletID := "WKFkmvsSFz5mC1cAX3edJC2e6hH6ow3X9E"
-	//accountID := "HX4tUVg5eETb6SvZeGeAFwk4PQ1CWS6dQeyjj3CqfYyK"
-	accountID := "4h4wnCmpzgy3ZTeoMHs3gjDCuWyXQcxDsk9dcwbNGhmR"
-
-	balance, err := tm.GetAssetsAccountBalance(testApp, walletID, accountID)
+	//tm := testInitWalletManager()
+	walletID := "W3TuDqe8VShgyPcg2dw4FRrNQbmxxiGPTJ"
+	accountID := "4gbLYX9shEoABGKaZrbTmAfHRXPKkVK6wudFEp7miNFZ7F9ZCL6t38Nr6tSr8GDS11tNZn7iwghsbt2qs6P1bkje"
+	//accountID := "3D58HdM35ZJrMgAzzRduGy6mPVqc8yeGNFm5kNBU16tZYkf84N9C4uppHtJWfw6bEXMtkFgXTxPnw3kN9m7QhiX2"
+	balance, err := tw.GetAssetsAccountBalance(testApp, walletID, accountID)
 	if err != nil {
 		log.Error("GetAssetsAccountBalance failed, unexpected error:", err)
 		return
@@ -118,19 +117,20 @@ func TestWalletManager_GetAssetsAccountBalance(t *testing.T) {
 }
 
 func TestWalletManager_GetAssetsAccountTokenBalance(t *testing.T) {
-	tm := testInitWalletManager()
-	walletID := "W7tue6SDce38fPwerdKqyebUh6yo2nTQLC"
-	accountID := "EPxkNBu6iMospC6aHQppv36UGY4mb1WqUE7oNZ7Xp9Df"
+
+	walletID := "W3TuDqe8VShgyPcg2dw4FRrNQbmxxiGPTJ"
+	accountID := "4gbLYX9shEoABGKaZrbTmAfHRXPKkVK6wudFEp7miNFZ7F9ZCL6t38Nr6tSr8GDS11tNZn7iwghsbt2qs6P1bkje"
+	//accountID := "3D58HdM35ZJrMgAzzRduGy6mPVqc8yeGNFm5kNBU16tZYkf84N9C4uppHtJWfw6bEXMtkFgXTxPnw3kN9m7QhiX2"
 
 	contract := openwallet.SmartContract{
-		Address:  "2",
+		Address:  "AIPP",
 		Symbol:   "SERO",
-		Name:     "TetherUSD",
-		Token:    "USDT",
-		Decimals: 8,
+		Name:     "AIPP",
+		Token:    "AIPP",
+		Decimals: 18,
 	}
 
-	balance, err := tm.GetAssetsAccountTokenBalance(testApp, walletID, accountID, contract)
+	balance, err := tw.GetAssetsAccountTokenBalance(testApp, walletID, accountID, contract)
 	if err != nil {
 		log.Error("GetAssetsAccountTokenBalance failed, unexpected error:", err)
 		return

@@ -16,15 +16,15 @@
 package sero
 
 import (
-	"encoding/hex"
 	"github.com/blocktree/openwallet/log"
 	"github.com/mr-tron/base58"
+	"github.com/sero-cash/go-sero/common/hexutil"
 	"github.com/shopspring/decimal"
 	"testing"
 )
 
 func TestSEROBlockScanner_GetBlocksInfo(t *testing.T) {
-	block, err := tw.GetBlocksInfo(1583452)
+	block, err := tw.GetBlocksInfo(1616058)
 	if err != nil {
 		t.Errorf("GetBlocksInfo failed, err: %v", err)
 		return
@@ -93,24 +93,26 @@ func TestWalletManager_DecOut(t *testing.T) {
 			//log.Debugf("o: %+v", o)
 			if o.Asset.Tkn != nil {
 				out := blockInfo.Outs[i]
-				log.Infof("[%d]txid: %s", i, hex.EncodeToString(out.State.TxHash[:]))
+				log.Infof("[%d]txid: %s", i, out.State.TxHash)
 				if out.State.OS.Out_O != nil {
-					address := base58.Encode(out.State.OS.Out_O.Addr[:])
+					addr, _ := hexutil.Decode(out.State.OS.Out_O.Addr)
+					address := base58.Encode(addr)
 					log.Infof("[%d]Out_O.Addr: %s", i, address)
 				}
 				if out.State.OS.Out_Z != nil {
-					address := base58.Encode(out.State.OS.Out_Z.PKr[:])
+					addr, _ := hexutil.Decode(out.State.OS.Out_Z.PKr)
+					address := base58.Encode(addr)
 					log.Infof("[%d]Out_Z.PKr: %s", i, address)
 				}
 
 				currency, _ := tw.LocalIdToCurrency(o.Asset.Tkn.Currency)
-				amount := decimal.NewFromBigInt(o.Asset.Tkn.Value.ToInt(), 0)
+				amount, _ := decimal.NewFromString(o.Asset.Tkn.Value)
 
 				log.Infof("[%d]Currency: %s", i, currency)
 				log.Infof("[%d]Value: %s", i, amount.String())
 			}
 			for _, nilobj := range o.Nils {
-				log.Infof("[%d]NIL: %+v", i, hex.EncodeToString(nilobj[:]))
+				log.Infof("[%d]NIL: %+v", i, nilobj)
 			}
 
 		}

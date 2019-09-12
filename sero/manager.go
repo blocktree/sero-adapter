@@ -51,7 +51,7 @@ func NewWalletManager() *WalletManager {
 	wm.Decoder = &sero_addrdec.AddressDecoderV2{}
 	wm.TxDecoder = NewTransactionDecoder(&wm)
 	wm.Log = log.NewOWLogger(wm.Symbol())
-	//wm.ContractDecoder = NewContractDecoder(&wm)
+	wm.ContractDecoder = NewContractDecoder(&wm)
 
 	return &wm
 }
@@ -249,16 +249,47 @@ func (wm *WalletManager) GasPrice() (*big.Int, error) {
 	return hexutil.DecodeBig(result.String())
 }
 
-// ListUnspent 未花记录
-func (wm *WalletManager) ListUnspent(tk, currency string) ([]*Unspent, error) {
+// ListUnspentByAddress 未花记录
+func (wm *WalletManager) ListUnspentByAddress(address, currency string, offset, limit int) ([]*Unspent, error) {
 
 	var utxo []*Unspent
 
-	wm.unspentDB.Select(
-		q.And(
-			q.Eq("TK", tk),
-			q.Eq("Currency", currency),
-		)).Find(&utxo)
+	if limit > 0 {
+		wm.unspentDB.Select(
+			q.And(
+				q.Eq("Address", address),
+				q.Eq("Currency", currency),
+			)).Limit(limit).Skip(offset).Find(&utxo)
+	} else {
+		wm.unspentDB.Select(
+			q.And(
+				q.Eq("Address", address),
+				q.Eq("Currency", currency),
+			)).Skip(offset).Find(&utxo)
+	}
+
+	return utxo, nil
+}
+
+// ListUnspent 未花记录
+func (wm *WalletManager) ListUnspent(tk string, currency string, offset, limit int) ([]*Unspent, error) {
+
+	var utxo []*Unspent
+
+	if limit > 0 {
+		wm.unspentDB.Select(
+			q.And(
+				q.Eq("TK", tk),
+				q.Eq("Currency", currency),
+			)).Limit(limit).Skip(offset).Find(&utxo)
+	} else {
+		wm.unspentDB.Select(
+			q.And(
+				q.Eq("TK", tk),
+				q.Eq("Currency", currency),
+			)).Skip(offset).Find(&utxo)
+	}
+
 	return utxo, nil
 }
 
@@ -287,10 +318,10 @@ func (wm *WalletManager) EstimateFee(feeRate decimal.Decimal) (decimal.Decimal, 
 
 // GenTxParam 构建交易
 func (wm *WalletManager) GenTxParam(
-	from, tk, currency string,
+	from, tk string,
 	decimals int32, feesRate decimal.Decimal,
 	usedUTXO []*Unspent,
-	to map[string]decimal.Decimal) (*gjson.Result, error) {
+	to []Out_O) (*gjson.Result, error) {
 
 	/*
 		"params": [{    //参数1：预组装交易结构
@@ -332,19 +363,22 @@ func (wm *WalletManager) GenTxParam(
 		ins = append(ins, u.Root)
 	}
 
-	currencyID, err := wm.LocalCurrencyToId(currency)
-	if err != nil {
-		return nil, err
-	}
+
 
 	outs := make([]interface{}, 0)
-	for addr, amount := range to {
-		pkr, _ := base58.Decode(addr)
+	for _, output := range to {
+		pkr, _ := base58.Decode(output.Addr)
+
+		currencyID, err := wm.LocalCurrencyToId(output.Asset.Tkn.Currency)
+		if err != nil {
+			return nil, err
+		}
+
 		out := Out{
 			Asset: Asset{
 				Tkn: Tkn{
 					Currency: currencyID,
-					Value:    amount.Shift(decimals).String(),
+					Value:    output.Asset.Tkn.Value,
 				},
 			},
 			PKr: hexutil.Encode(pkr),
@@ -376,17 +410,22 @@ func (wm *WalletManager) GenTxParam(
 }
 
 // SignTxWithSk 签名交易
-func (wm *WalletManager) SignTxWithSk(txJSON string, sk []byte) (*gjson.Result, error) {
+func (wm *WalletManager) SignTxWithSk(txJSON string, seed []byte) (*gjson.Result, error) {
+
+	sk, err := wm.LocalSeed2Sk(hexutil.Encode(seed))
+	if err != nil {
+		return nil, err
+	}
 
 	var txStruct map[string]interface{}
-	err := json.Unmarshal([]byte(txJSON), &txStruct)
+	err = json.Unmarshal([]byte(txJSON), &txStruct)
 	if err != nil {
 		return nil, err
 	}
 
 	request := []interface{}{
 		txStruct,
-		hexutil.Encode(sk),
+		sk,
 	}
 
 	result, err := wm.WalletClient.Call("local_signTxWithSk", request)
@@ -450,10 +489,10 @@ func (wm *WalletManager) LocalCurrencyToId(name string) (string, error) {
 	return result.String(), nil
 }
 
-func (wm *WalletManager) LocalIdToCurrency(id Uint256) (string, error) {
+func (wm *WalletManager) LocalIdToCurrency(id string) (string, error) {
 
 	request := []interface{}{
-		hexutil.Encode(id[:]),
+		id,
 	}
 
 	result, err := wm.WalletClient.Call("local_idToCurrency", request)

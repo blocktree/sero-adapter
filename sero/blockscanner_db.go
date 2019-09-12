@@ -16,7 +16,6 @@
 package sero
 
 import (
-	"encoding/hex"
 	"errors"
 	"path/filepath"
 
@@ -92,7 +91,7 @@ func (bs *SEROBlockScanner) GetLocalBlock(height uint64) (*BlockData, error) {
 	}
 	defer db.Close()
 
-	err = db.One("Height", height, &blockHeader)
+	err = db.One("BlockNumber", height, &blockHeader)
 	if err != nil {
 		return nil, err
 	}
@@ -141,7 +140,7 @@ func (bs *SEROBlockScanner) DeleteUnscanRecord(height uint64) error {
 
 
 //SaveUnspent 记录新的未花
-func (bs *SEROBlockScanner) SaveUnspent(utxo *Unspent, nilKeys [][]byte) error {
+func (bs *SEROBlockScanner) SaveUnspent(utxo *Unspent, nilKeys []string) error {
 
 	db := bs.wm.unspentDB
 	tx, err := db.Begin(true)
@@ -158,8 +157,7 @@ func (bs *SEROBlockScanner) SaveUnspent(utxo *Unspent, nilKeys [][]byte) error {
 
 	//nil与utxo关联，保存
 	for _, nilkey := range nilKeys {
-		nilkeyhex := hex.EncodeToString(nilkey[:])
-		err = tx.Set(NilKeyBucket, nilkeyhex, utxo.Root)
+		err = tx.Set(NilKeyBucket, nilkey, utxo.Root)
 	}
 
 	return tx.Commit()
@@ -193,14 +191,14 @@ func (bs *SEROBlockScanner) DeleteUnspent(nilKey string) error {
 		return err
 	}
 
-	var utxo *Unspent
+	var utxo Unspent
 	err = tx.One("Root", root, &utxo)
 	if err != nil {
 		return err
 	}
 
 	//删除utxo记录
-	err = tx.DeleteStruct(utxo)
+	err = tx.DeleteStruct(&utxo)
 	if err != nil {
 		return err
 	}
@@ -214,10 +212,12 @@ func (bs *SEROBlockScanner) DeleteUnspent(nilKey string) error {
 	return tx.Commit()
 }
 
-// LockUnspent 锁定发送中utxo
-func (bs *SEROBlockScanner) LockUnspent(utxo []*Unspent) error {
+
+//DeleteUnspent 删除已使用的未花
+func (bs *SEROBlockScanner) DeleteUnspentByHeight(height uint64) error {
 
 	db := bs.wm.unspentDB
+
 	tx, err := db.Begin(true)
 	if err != nil {
 		return err
@@ -225,13 +225,35 @@ func (bs *SEROBlockScanner) LockUnspent(utxo []*Unspent) error {
 
 	defer tx.Rollback()
 
-	for _, u := range utxo {
-		u.Sending = true
-		err = tx.Save(u)
-		if err != nil {
-			return err
-		}
+	var list []*Unspent
+	err = db.Find("Height", height, &list)
+	if err != nil {
+		return err
+	}
+
+	for _, u := range list {
+		tx.DeleteStruct(u)
 	}
 
 	return tx.Commit()
+}
+
+// LockUnspent 锁定发送中utxo
+func (wm *WalletManager) LockUnspent(root string) error {
+
+	db := wm.unspentDB
+
+	var utxo Unspent
+	err := db.One("Root", root, &utxo)
+	if err != nil {
+		return err
+	}
+
+	utxo.Sending = true
+	err = db.Save(&utxo)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

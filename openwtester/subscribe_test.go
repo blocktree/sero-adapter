@@ -32,7 +32,7 @@ type subscriberSingle struct {
 
 //BlockScanNotify 新区块扫描完成通知
 func (sub *subscriberSingle) BlockScanNotify(header *openwallet.BlockHeader) error {
-	log.Notice("header:", header)
+	//log.Notice("header:", header)
 	return nil
 }
 
@@ -53,26 +53,23 @@ func (sub *subscriberSingle) BlockExtractDataNotify(sourceKey string, data *open
 	return nil
 }
 
+func test_scanTargetFunc(target openwallet.ScanTarget) (string, bool) {
+	addr, err := tw.GetAddress(testApp, "", "", target.Address)
+	if err != nil {
+		return "", false
+	}
+	if addr == nil {
+		return "", false
+	}
+	return addr.AccountID, true
+}
+
 func TestSubscribeAddress(t *testing.T) {
 
 	var (
 		endRunning = make(chan bool, 1)
 		symbol     = "SERO"
-		addrs      = map[string]string{
-			"QU2DzDboaMoh5bG4M4RXRwQu1BsngLFTr6LhWga5iSB27ay8U6SNnwkcX72ceCGfLCXVJwD8KwXwbtXMiXw5sNek7SXcXQKTKCvwH469oHSirRVKhQVs534BMYHSQ6Wn8VC": "5tb3GBhJks3QMpPsPVabRQG4ZuhjorGZvooQhif2uRcbwJq5ZsXpCFc78hEU9Wom38MrFqQbu7SXWG7foGYt7JV6",
-			"mLeM72Gvyf2iddRNFwfYj4zTAX5CPtJ7rTDy5YJe6Vhn6x3f6dFdK1HHULYpq6xjNiwk8zCCxkYWheyBrbnWiL2dDWiWeH9AYhQ4RM3mAevLyvxbufP1Eo3UuFqLvBTmMFJ": "5tb3GBhJks3QMpPsPVabRQG4ZuhjorGZvooQhif2uRcbwJq5ZsXpCFc78hEU9Wom38MrFqQbu7SXWG7foGYt7JV6",
-			"28HjcmZXRBLboNrdSEzGMaSyW8Uz4UotbA4gjHUQWaWT2RCM785eAEs5WAsfp1MTS5N85Wncwf9N4ChAjYohA33h5f3fWnm5WHrrQp2g677uAd3YyZJrPpEvMLiK84h9AxKD": "5tb3GBhJks3QMpPsPVabRQG4ZuhjorGZvooQhif2uRcbwJq5ZsXpCFc78hEU9Wom38MrFqQbu7SXWG7foGYt7JV6",
-		}
 	)
-
-	//GetSourceKeyByAddress 获取地址对应的数据源标识
-	scanTargetFunc := func(target openwallet.ScanTarget) (string, bool) {
-		key, ok := addrs[target.Address]
-		if !ok {
-			return "", false
-		}
-		return key, true
-	}
 
 	assetsMgr, err := openw.GetAssetsAdapter(symbol)
 	if err != nil {
@@ -95,17 +92,21 @@ func TestSubscribeAddress(t *testing.T) {
 	}
 
 	scanner := assetsMgr.GetBlockScanner()
-	scanner.SetRescanBlockHeight(1583452)
+	scanner.SetRescanBlockHeight(1624653)
+	//scanner.SetRescanBlockHeight(1613221)
 
 	if scanner == nil {
 		log.Error(symbol, "is not support block scan")
 		return
 	}
 
-	scanner.SetBlockScanTargetFunc(scanTargetFunc)
+	scanner.SetBlockScanTargetFunc(test_scanTargetFunc)
 
 	sub := subscriberSingle{}
 	scanner.AddObserver(&sub)
+
+	wrapper := &walletWrapper{wm: tw}
+	scanner.SetBlockScanWalletDAI(wrapper)
 
 	scanner.Run()
 

@@ -11,18 +11,7 @@ const (
 	//币种
 	Symbol    = "SERO"
 	CurveType = owcrypt.ECC_CURVE_SECP256K1
-	MaxTxInputs = 50
-
-	//默认配置内容
-	defaultConfig = `
-
-# RPC api url
-serverAPI = ""
-# AE networkID, default(mainnet) networkID = "ae_mainnet",
-networkID = "ae_mainnet"
-# fix fees for transaction
-fixFees = "0.00002"
-`
+	MaxTxInputs = 200
 )
 
 type WalletConfig struct {
