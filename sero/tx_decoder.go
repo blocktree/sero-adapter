@@ -23,6 +23,10 @@ import (
 	"time"
 )
 
+const (
+	MinConfirms = uint64(12)
+)
+
 type TransactionDecoder struct {
 	openwallet.TransactionDecoderBase
 	wm *WalletManager //钱包管理者
@@ -63,7 +67,7 @@ func (decoder *TransactionDecoder) CreateRawTransaction(wrapper openwallet.Walle
 	}
 
 	//查找账户的代币utxo
-	unspents, err := decoder.wm.ListUnspent(accountID, currency, 0, 50)
+	unspents, err := decoder.wm.ListUnspent(accountID, currency, 0, MaxTxInputs)
 	if err != nil {
 		return err
 	}
@@ -111,6 +115,12 @@ func (decoder *TransactionDecoder) CreateRawTransaction(wrapper openwallet.Walle
 	fees, feesRate, err := decoder.wm.EstimateFee(feesRate)
 	receive = totalSend
 
+	//获取当前最大高度
+	currentHeight, err := decoder.wm.GetBlockHeight()
+	if err != nil {
+		return err
+	}
+
 	if rawTx.Coin.IsContract {
 		//查找账户的主币的utxo
 		mainUnspents, err := decoder.wm.ListUnspent(accountID, rawTx.Coin.Symbol, 0, 50)
@@ -119,12 +129,17 @@ func (decoder *TransactionDecoder) CreateRawTransaction(wrapper openwallet.Walle
 		}
 
 		if len(mainUnspents) == 0 {
-			return openwallet.Errorf(openwallet.ErrInsufficientBalanceOfAccount, "[%s] %s balance is not enough", accountID, currency)
+			return openwallet.Errorf(openwallet.ErrInsufficientBalanceOfAccount, "[%s] %s balance is not enough(utxo meet 12 confirmations)", accountID, currency)
 		}
 
 		//计算SERO手续费是否足够
 		seroBalance := decimal.Zero
 		for _, u := range mainUnspents {
+
+			//utxo确认书必须大于6个才使用
+			if currentHeight-u.Height <= MinConfirms {
+				continue
+			}
 
 			if u.Sending == false {
 				ua, _ := decimal.NewFromString(u.Value)
@@ -144,7 +159,7 @@ func (decoder *TransactionDecoder) CreateRawTransaction(wrapper openwallet.Walle
 		}
 
 		if seroBalance.LessThan(fees) {
-			return openwallet.Errorf(openwallet.ErrInsufficientBalanceOfAccount, "The %s balance: %s is not enough! ", currency, balance.String())
+			return openwallet.Errorf(openwallet.ErrInsufficientBalanceOfAccount, "The %s balance: %s is not enough(utxo meet 12 confirmations)", currency, balance.String())
 		}
 	} else {
 		totalSend = totalSend.Add(fees)
@@ -153,6 +168,10 @@ func (decoder *TransactionDecoder) CreateRawTransaction(wrapper openwallet.Walle
 
 	//计算一个可用于支付的余额
 	for _, u := range unspents {
+		//utxo确认书必须大于6个才使用
+		if currentHeight-u.Height <= MinConfirms {
+			continue
+		}
 
 		if u.Sending == false {
 			ua, _ := decimal.NewFromString(u.Value)
@@ -171,7 +190,7 @@ func (decoder *TransactionDecoder) CreateRawTransaction(wrapper openwallet.Walle
 	}
 
 	if balance.LessThan(totalSend) {
-		return openwallet.Errorf(openwallet.ErrInsufficientBalanceOfAccount, "The %s balance: %s is not enough! ", currency, balance.String())
+		return openwallet.Errorf(openwallet.ErrInsufficientBalanceOfAccount, "The %s balance: %s is not enough(utxo meet 12 confirmations)", currency, balance.String())
 	}
 
 	//取账户最后一个地址
@@ -337,8 +356,21 @@ func (decoder *TransactionDecoder) CreateSummaryRawTransactionWithError(wrapper 
 		return nil, openwallet.Errorf(openwallet.ErrInsufficientBalanceOfAccount, "[%s] %s balance is not enough", accountID, currency)
 	}
 
+	//获取当前最大高度
+	currentHeight, err := decoder.wm.GetBlockHeight()
+	if err != nil {
+		return nil, err
+	}
+
 	//合计所有utxo
 	for _, u := range tokenUnspents {
+
+		//utxo确认书必须大于6个才使用
+		//confirms := currentHeight-u.Height
+		//decoder.wm.Log.Debugf("utxo confirms = %d", confirms)
+		if currentHeight-u.Height <= MinConfirms {
+			continue
+		}
 
 		if u.Sending == false {
 			ua, _ := decimal.NewFromString(u.Value)
@@ -367,7 +399,7 @@ func (decoder *TransactionDecoder) CreateSummaryRawTransactionWithError(wrapper 
 		}
 
 		//查找足够付费的utxo
-		supportUnspent, supportErr := decoder.getUTXOSatisfyAmount(symbolUnspents, fees)
+		supportUnspent, supportErr := decoder.getUTXOSatisfyAmount(currentHeight, symbolUnspents, fees)
 		if supportErr != nil {
 			return nil, supportErr
 		}
@@ -395,6 +427,10 @@ func (decoder *TransactionDecoder) CreateSummaryRawTransactionWithError(wrapper 
 
 	} else {
 		sumAmount = balance.Sub(fees)
+	}
+
+	if sumAmount.LessThanOrEqual(decimal.Zero) {
+		return rawTxArray, nil
 	}
 
 	sumOutput := Out_O{
@@ -560,12 +596,18 @@ func (decoder *TransactionDecoder) SubmitRawTransaction(wrapper openwallet.Walle
 }
 
 // getAssetsAccountUnspentSatisfyAmount
-func (decoder *TransactionDecoder) getUTXOSatisfyAmount(unspents []*Unspent, amount decimal.Decimal) (*Unspent, *openwallet.Error) {
+func (decoder *TransactionDecoder) getUTXOSatisfyAmount(currentHeight uint64, unspents []*Unspent, amount decimal.Decimal) (*Unspent, *openwallet.Error) {
 
 	var utxo *Unspent
 
 	if unspents != nil {
 		for _, u := range unspents {
+
+			//utxo确认书必须大于6个才使用
+			if currentHeight-u.Height <= MinConfirms {
+				continue
+			}
+
 			if !u.Sending {
 				ua, _ := decimal.NewFromString(u.Value)
 				if ua.GreaterThanOrEqual(amount) {

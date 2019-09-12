@@ -171,7 +171,7 @@ func (bs *SEROBlockScanner) DeleteUnspent(nilKey string) error {
 	//先判断nilKey是否存在
 	exsit, err := db.KeyExists(NilKeyBucket, nilKey)
 	if err != nil {
-		return err
+		return nil
 	}
 
 	if !exsit {
