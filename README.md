@@ -25,10 +25,10 @@ https://github.com/sero-cash/go-sero/releases/tag/v1.0.0-rc11
 $ export DYLD_LIBRARY_PATH="./czero/lib/"
 $ export LD_LIBRARY_PATH="./czero/lib/"
 
-//启动本地节点，这个节点不同步区块数据，只是提供密码算法
+//启动本地gero节点，这个节点不同步区块数据，只是提供密码算法
 $ bin/gero --mineMode --datadir ~/geroData --nodiscover --rpc --rpcport 8545 --rpcapi local,sero --rpcaddr 127.0.0.1 --rpccorsdomain "*" --exchangeValueStr
 
-//后台运行
+//后台运行gero
 $ nohup bin/gero --mineMode --datadir ~/geroData --nodiscover --rpc --rpcport 8545 --rpcapi local,sero --rpcaddr 127.0.0.1 --rpccorsdomain "*" --exchangeValueStr >> gero.log 2>&1 &
 
 ```

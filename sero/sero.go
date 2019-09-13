@@ -80,7 +80,7 @@ func (wm *WalletManager) LoadAssetsConfig(c config.Configer) error {
 
 	//加载未花数据库
 	unspentdbfile := filepath.Join(wm.Config.dbPath, wm.Config.unspentFile)
-	db, err := storm.Open(
+	unspentdb, err := storm.Open(
 		unspentdbfile,
 		storm.BoltOptions(
 			0600,
@@ -93,7 +93,13 @@ func (wm *WalletManager) LoadAssetsConfig(c config.Configer) error {
 		return err
 	}
 
-	wm.unspentDB = db
+	blockchaindb, err := storm.Open(filepath.Join(wm.Config.dbPath, wm.Config.BlockchainFile))
+	if err != nil {
+		return err
+	}
+
+	wm.unspentDB = unspentdb
+	wm.blockChainDB = blockchaindb
 	wm.Decoder.Client = wm.WalletClient
 
 	return nil

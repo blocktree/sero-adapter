@@ -17,9 +17,6 @@ package sero
 
 import (
 	"errors"
-	"path/filepath"
-
-	"github.com/asdine/storm"
 )
 
 const (
@@ -31,14 +28,9 @@ const (
 func (bs *SEROBlockScanner) SaveLocalBlockHead(blockHeight uint64, blockHash string) error {
 
 	//获取本地区块高度
-	db, err := storm.Open(filepath.Join(bs.wm.Config.dbPath, bs.wm.Config.BlockchainFile))
-	if err != nil {
-		return err
-	}
-	defer db.Close()
 
-	db.Set(blockchainBucket, "blockHeight", &blockHeight)
-	db.Set(blockchainBucket, "blockHash", &blockHash)
+	bs.wm.blockChainDB.Set(blockchainBucket, "blockHeight", &blockHeight)
+	bs.wm.blockChainDB.Set(blockchainBucket, "blockHash", &blockHash)
 
 	return nil
 }
@@ -51,15 +43,10 @@ func (bs *SEROBlockScanner) GetLocalBlockHead() (uint64, string) {
 		blockHash   string
 	)
 
-	//获取本地区块高度
-	db, err := storm.Open(filepath.Join(bs.wm.Config.dbPath, bs.wm.Config.BlockchainFile))
-	if err != nil {
-		return 0, ""
-	}
-	defer db.Close()
+	////获取本地区块高度
 
-	db.Get(blockchainBucket, "blockHeight", &blockHeight)
-	db.Get(blockchainBucket, "blockHash", &blockHash)
+	bs.wm.blockChainDB.Get(blockchainBucket, "blockHeight", &blockHeight)
+	bs.wm.blockChainDB.Get(blockchainBucket, "blockHash", &blockHash)
 
 	return blockHeight, blockHash
 }
@@ -67,13 +54,8 @@ func (bs *SEROBlockScanner) GetLocalBlockHead() (uint64, string) {
 //SaveLocalBlock 记录本地新区块
 func (bs *SEROBlockScanner) SaveLocalBlock(blockHeader *BlockData) error {
 
-	db, err := storm.Open(filepath.Join(bs.wm.Config.dbPath, bs.wm.Config.BlockchainFile))
-	if err != nil {
-		return err
-	}
-	defer db.Close()
 
-	db.Save(blockHeader)
+	bs.wm.blockChainDB.Save(blockHeader)
 
 	return nil
 }
@@ -85,13 +67,7 @@ func (bs *SEROBlockScanner) GetLocalBlock(height uint64) (*BlockData, error) {
 		blockHeader BlockData
 	)
 
-	db, err := storm.Open(filepath.Join(bs.wm.Config.dbPath, bs.wm.Config.BlockchainFile))
-	if err != nil {
-		return nil, err
-	}
-	defer db.Close()
-
-	err = db.One("BlockNumber", height, &blockHeader)
+	err := bs.wm.blockChainDB.One("BlockNumber", height, &blockHeader)
 	if err != nil {
 		return nil, err
 	}
@@ -106,33 +82,24 @@ func (bs *SEROBlockScanner) SaveUnscanRecord(record *UnscanRecord) error {
 		return errors.New("the unscan record to save is nil")
 	}
 
-	//获取本地区块高度
-	db, err := storm.Open(filepath.Join(bs.wm.Config.dbPath, bs.wm.Config.BlockchainFile))
-	if err != nil {
-		return err
-	}
-	defer db.Close()
+	////获取本地区块高度
 
-	return db.Save(record)
+	return bs.wm.blockChainDB.Save(record)
 }
 
 //DeleteUnscanRecord 删除指定高度的未扫记录
 func (bs *SEROBlockScanner) DeleteUnscanRecord(height uint64) error {
 	//获取本地区块高度
-	db, err := storm.Open(filepath.Join(bs.wm.Config.dbPath, bs.wm.Config.BlockchainFile))
-	if err != nil {
-		return err
-	}
-	defer db.Close()
+
 
 	var list []*UnscanRecord
-	err = db.Find("BlockHeight", height, &list)
+	err := bs.wm.blockChainDB.Find("BlockHeight", height, &list)
 	if err != nil {
 		return err
 	}
 
 	for _, r := range list {
-		db.DeleteStruct(r)
+		bs.wm.blockChainDB.DeleteStruct(r)
 	}
 
 	return nil

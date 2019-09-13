@@ -35,13 +35,14 @@ import (
 type WalletManager struct {
 	openwallet.AssetsAdapterBase
 	Config          *WalletConfig                   // 节点配置
-	Decoder         *sero_addrdec.AddressDecoderV2     //地址编码器
+	Decoder         *sero_addrdec.AddressDecoderV2  //地址编码器
 	TxDecoder       openwallet.TransactionDecoder   //交易单编码器
 	Log             *log.OWLogger                   //日志工具
 	ContractDecoder openwallet.SmartContractDecoder //智能合约解析器
 	Blockscanner    *SEROBlockScanner               //区块扫描器
-	WalletClient    *client.Client                         // 节点客户端
+	WalletClient    *client.Client                  // 节点客户端
 	unspentDB       *storm.DB                       //未花记录数据库
+	blockChainDB    *storm.DB                       //区块链数据库
 }
 
 func NewWalletManager() *WalletManager {
@@ -97,12 +98,12 @@ func (wm *WalletManager) CreateAccount(alias string, key *hdkeystore.HDKey, newA
 		return nil, err
 	}
 
-	tk, err :=  wm.LocalSk2Tk(sk)     //跟踪公钥
+	tk, err := wm.LocalSk2Tk(sk) //跟踪公钥
 	if err != nil {
 		return nil, err
 	}
 
-	pk, err :=  wm.LocalTk2Pk(tk)     //公钥
+	pk, err := wm.LocalTk2Pk(tk) //公钥
 	if err != nil {
 		return nil, err
 	}
@@ -362,8 +363,6 @@ func (wm *WalletManager) GenTxParam(
 	for _, u := range usedUTXO {
 		ins = append(ins, u.Root)
 	}
-
-
 
 	outs := make([]interface{}, 0)
 	for _, output := range to {

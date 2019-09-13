@@ -534,7 +534,7 @@ func (bs *SEROBlockScanner) extractTxInput(block *BlockData, trx *gjson.Result, 
 		Symbol:           bs.wm.Symbol(),
 		BalanceModelType: openwallet.BalanceModelTypeAddress})
 	if ok {
-
+		bs.wm.Log.Infof("scanTargetFunc found: %s", sourceKey)
 		//组装一个SERO手续费作为输入
 		feesInput := openwallet.TxInput{}
 		feesInput.Coin = openwallet.Coin{
@@ -569,8 +569,8 @@ func (bs *SEROBlockScanner) extractTxInput(block *BlockData, trx *gjson.Result, 
 			//因为输入的金额匿名，需要查钱包系统的数据库中的交易单
 			txsDB, _ := bs.WalletDAI.GetTransactionByTxID(txid, bs.wm.Symbol())
 			if txsDB != nil {
+				bs.wm.Log.Infof("GetTransactionByTxID found: %s", txid)
 				for _, txDB := range txsDB {
-
 					currency := ""
 					if txDB.Coin.IsContract {
 						currency = txDB.Coin.Contract.Address
@@ -655,7 +655,7 @@ func (bs *SEROBlockScanner) extractTxOutput(block *BlockData, trx *gjson.Result,
 			Symbol:           bs.wm.Symbol(),
 			BalanceModelType: openwallet.BalanceModelTypeAddress})
 		if ok {
-
+			bs.wm.Log.Infof("scanTargetFunc found: %s", sourceKey)
 			tkBytes, err := base58.Decode(sourceKey)
 			if err != nil {
 				return nil, isTokenTrasfer, fmt.Errorf("base58 decode TK failed")
@@ -739,6 +739,7 @@ func (bs *SEROBlockScanner) extractTxOutput(block *BlockData, trx *gjson.Result,
 			if err != nil {
 				return nil, isTokenTrasfer, fmt.Errorf("save unspent failed")
 			}
+			bs.wm.Log.Infof("SaveUnspent successed ")
 		}
 	}
 

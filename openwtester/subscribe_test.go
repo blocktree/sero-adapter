@@ -50,6 +50,23 @@ func (sub *subscriberSingle) BlockExtractDataNotify(sourceKey string, data *open
 
 	log.Std.Notice("data.Transaction: %+v", data.Transaction)
 
+	balance, err := sub.manager.GetAssetsAccountBalance(testApp, "", sourceKey)
+	if err != nil {
+		log.Errorf("GetAssetsAccountBalance failed, err: %v", err)
+	}
+
+	log.Std.Notice("balance: %s", balance.Balance)
+
+	if data.Transaction.Coin.IsContract {
+
+		balance, err := sub.manager.GetAssetsAccountTokenBalance(testApp, "", sourceKey, data.Transaction.Coin.Contract)
+		if err != nil {
+			log.Errorf("GetAssetsAccountTokenBalance failed, err: %v", err)
+		}
+
+		log.Std.Notice("%s balance: %s", balance.Contract.Token, balance.Balance.Balance)
+	}
+
 	return nil
 }
 
@@ -92,7 +109,7 @@ func TestSubscribeAddress(t *testing.T) {
 	}
 
 	scanner := assetsMgr.GetBlockScanner()
-	scanner.SetRescanBlockHeight(1633006)
+	scanner.SetRescanBlockHeight(1636585)
 	//scanner.SetRescanBlockHeight(1613221)
 
 	if scanner == nil {
@@ -102,7 +119,7 @@ func TestSubscribeAddress(t *testing.T) {
 
 	scanner.SetBlockScanTargetFunc(test_scanTargetFunc)
 
-	sub := subscriberSingle{}
+	sub := subscriberSingle{manager:tw}
 	scanner.AddObserver(&sub)
 
 	wrapper := &walletWrapper{wm: tw}
