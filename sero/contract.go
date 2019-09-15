@@ -16,6 +16,7 @@
 package sero
 
 import (
+	"github.com/blocktree/openwallet/log"
 	"github.com/blocktree/openwallet/openwallet"
 	"github.com/shopspring/decimal"
 )
@@ -37,8 +38,10 @@ func (decoder *ContractDecoder) GetTokenBalanceByAddress(contract openwallet.Sma
 	var tokenBalanceList []*openwallet.TokenBalance
 
 	for _, addr := range address {
+		log.Infof("GetTokenBalanceByAddress: %s", addr)
 		utxo, err := decoder.wm.ListUnspentByAddress(addr, contract.Address, 0, -1)
 		if err != nil {
+			log.Errorf("ListUnspentByAddress failed, err: %v", err)
 			return nil, nil
 		}
 

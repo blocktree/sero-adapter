@@ -253,20 +253,27 @@ func (wm *WalletManager) GasPrice() (*big.Int, error) {
 // ListUnspentByAddress 未花记录
 func (wm *WalletManager) ListUnspentByAddress(address, currency string, offset, limit int) ([]*Unspent, error) {
 
-	var utxo []*Unspent
+	var (
+		utxo []*Unspent
+		err error
+	)
 
 	if limit > 0 {
-		wm.unspentDB.Select(
+		err = wm.unspentDB.Select(
 			q.And(
 				q.Eq("Address", address),
 				q.Eq("Currency", currency),
 			)).Limit(limit).Skip(offset).Find(&utxo)
 	} else {
-		wm.unspentDB.Select(
+		err = wm.unspentDB.Select(
 			q.And(
 				q.Eq("Address", address),
 				q.Eq("Currency", currency),
 			)).Skip(offset).Find(&utxo)
+	}
+
+	if err != nil {
+		return nil, err
 	}
 
 	return utxo, nil
@@ -275,20 +282,26 @@ func (wm *WalletManager) ListUnspentByAddress(address, currency string, offset, 
 // ListUnspent 未花记录
 func (wm *WalletManager) ListUnspent(tk string, currency string, offset, limit int) ([]*Unspent, error) {
 
-	var utxo []*Unspent
+	var (
+		utxo []*Unspent
+		err error
+	)
 
 	if limit > 0 {
-		wm.unspentDB.Select(
+		err = wm.unspentDB.Select(
 			q.And(
 				q.Eq("TK", tk),
 				q.Eq("Currency", currency),
 			)).Limit(limit).Skip(offset).Find(&utxo)
 	} else {
-		wm.unspentDB.Select(
+		err = wm.unspentDB.Select(
 			q.And(
 				q.Eq("TK", tk),
 				q.Eq("Currency", currency),
 			)).Skip(offset).Find(&utxo)
+	}
+	if err != nil {
+		return nil, err
 	}
 
 	return utxo, nil

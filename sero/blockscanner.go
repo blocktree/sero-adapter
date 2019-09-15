@@ -17,6 +17,7 @@ package sero
 
 import (
 	"fmt"
+	"github.com/blocktree/openwallet/log"
 	"github.com/blocktree/openwallet/openwallet"
 	"github.com/mr-tron/base58"
 	"github.com/sero-cash/go-sero/common/hexutil"
@@ -850,8 +851,10 @@ func (bs *SEROBlockScanner) GetBalanceByAddress(address ...string) ([]*openwalle
 	addrBalanceArr := make([]*openwallet.Balance, 0)
 
 	for _, addr := range address {
+		log.Infof("GetTokenBalanceByAddress: %s", addr)
 		utxo, err := bs.wm.ListUnspentByAddress(addr, bs.wm.Symbol(), 0, -1)
 		if err != nil {
+			log.Errorf("ListUnspentByAddress failed, err: %v", err)
 			return nil, nil
 		}
 
