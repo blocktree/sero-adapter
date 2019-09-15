@@ -22,7 +22,6 @@ import (
 	"github.com/blocktree/openwallet/openwallet"
 	"path/filepath"
 	"testing"
-	"time"
 )
 
 ////////////////////////// 测试单个扫描器 //////////////////////////
@@ -111,8 +110,6 @@ func TestSubscribeAddress(t *testing.T) {
 
 	scanner := assetsMgr.GetBlockScanner()
 
-	//scanner.SetRescanBlockHeight(1613221)
-
 	if scanner == nil {
 		log.Error(symbol, "is not support block scan")
 		return
@@ -120,23 +117,56 @@ func TestSubscribeAddress(t *testing.T) {
 
 	scanner.SetBlockScanTargetFunc(test_scanTargetFunc)
 
-	sub := subscriberSingle{manager:tw}
+	sub := subscriberSingle{manager: tw}
 	scanner.AddObserver(&sub)
 
 	wrapper := &walletWrapper{wm: tw}
 	scanner.SetBlockScanWalletDAI(wrapper)
 
-	scanner.Run()
-
-	time.Sleep(15 * time.Second)
-
-	scanner.Stop()
-
-	time.Sleep(5 * time.Second)
-
-	scanner.SetRescanBlockHeight(1636585)
+	scanner.SetRescanBlockHeight(1649200)
 
 	scanner.Run()
 
 	<-endRunning
+}
+
+func TestSubscribeScanBlock(t *testing.T) {
+
+	var (
+		symbol = "SERO"
+	)
+
+	assetsMgr, err := openw.GetAssetsAdapter(symbol)
+	if err != nil {
+		log.Error(symbol, "is not support")
+		return
+	}
+
+	//读取配置
+	absFile := filepath.Join(configFilePath, symbol+".ini")
+
+	c, err := config.NewConfig("ini", absFile)
+	if err != nil {
+		return
+	}
+	assetsMgr.LoadAssetsConfig(c)
+
+	assetsLogger := assetsMgr.GetAssetsLogger()
+	if assetsLogger != nil {
+		assetsLogger.SetLogFuncCall(true)
+	}
+
+	//log.Debug("already got scanner:", assetsMgr)
+	scanner := assetsMgr.GetBlockScanner()
+	if scanner == nil {
+		log.Error(symbol, "is not support block scan")
+		return
+	}
+
+	scanner.SetBlockScanTargetFunc(test_scanTargetFunc)
+
+	sub := subscriberSingle{manager: tw}
+	scanner.AddObserver(&sub)
+
+	scanner.ScanBlock(1649219)
 }

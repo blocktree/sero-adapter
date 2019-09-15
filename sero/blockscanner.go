@@ -136,15 +136,6 @@ func (bs *SEROBlockScanner) ScanBlockTask() {
 			break
 		}
 
-		//查询该高度的utxo和作废码信息
-		blockInfo, err := bs.wm.GetBlocksInfo(currentHeight)
-		if err != nil {
-			bs.wm.Log.Std.Info("block scanner can not get new block data by rpc; unexpected error: %v", err)
-			break
-		}
-
-		block.blockInfo = blockInfo
-
 		isFork := false
 
 		if currentHash != block.ParentHash {
@@ -201,6 +192,7 @@ func (bs *SEROBlockScanner) ScanBlockTask() {
 			err := bs.BatchExtractTransactions(block)
 			if err != nil {
 				bs.wm.Log.Std.Error("block scanner ran BatchExtractTransactions occured unexpected error: %v", err)
+				break
 			}
 
 			//保存本地新高度
@@ -235,6 +227,14 @@ func (bs *SEROBlockScanner) BatchExtractTransactions(block *BlockData) error {
 	if len(block.transactions) == 0 {
 		return nil
 	}
+
+	//查询该高度的utxo和作废码信息
+	blockInfo, err := bs.wm.GetBlocksInfo(block.BlockNumber)
+	if err != nil {
+		return err
+	}
+
+	block.blockInfo = blockInfo
 
 	//先作废已使用的utxo
 	for _, nilKey := range block.blockInfo.Nils {

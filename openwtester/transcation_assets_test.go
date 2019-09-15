@@ -147,7 +147,7 @@ func TestTransfer(t *testing.T) {
 
 	for _, to := range targets {
 
-		rawTx, err := testCreateTransactionStep(tw, walletID, accountID, to, "0.12345", "", nil)
+		rawTx, err := testCreateTransactionStep(tw, walletID, accountID, to, "0.012345", "", nil)
 		if err != nil {
 			return
 		}
