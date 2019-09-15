@@ -139,11 +139,10 @@ func TestWalletManager_GetAssetsAccountTokenBalance(t *testing.T) {
 }
 
 func TestWalletManager_GetEstimateFeeRate(t *testing.T) {
-	tm := testInitWalletManager()
 	coin := openwallet.Coin{
-		Symbol: "VSYS",
+		Symbol: "SERO",
 	}
-	feeRate, unit, err := tm.GetEstimateFeeRate(coin)
+	feeRate, unit, err := tw.GetEstimateFeeRate(coin)
 	if err != nil {
 		log.Error("GetEstimateFeeRate failed, unexpected error:", err)
 		return

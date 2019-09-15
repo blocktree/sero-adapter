@@ -22,6 +22,7 @@ import (
 	"github.com/blocktree/openwallet/openwallet"
 	"path/filepath"
 	"testing"
+	"time"
 )
 
 ////////////////////////// 测试单个扫描器 //////////////////////////
@@ -109,7 +110,7 @@ func TestSubscribeAddress(t *testing.T) {
 	}
 
 	scanner := assetsMgr.GetBlockScanner()
-	scanner.SetRescanBlockHeight(1636585)
+
 	//scanner.SetRescanBlockHeight(1613221)
 
 	if scanner == nil {
@@ -124,6 +125,16 @@ func TestSubscribeAddress(t *testing.T) {
 
 	wrapper := &walletWrapper{wm: tw}
 	scanner.SetBlockScanWalletDAI(wrapper)
+
+	scanner.Run()
+
+	time.Sleep(15 * time.Second)
+
+	scanner.Stop()
+
+	time.Sleep(5 * time.Second)
+
+	scanner.SetRescanBlockHeight(1636585)
 
 	scanner.Run()
 

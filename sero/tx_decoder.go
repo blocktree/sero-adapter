@@ -595,6 +595,16 @@ func (decoder *TransactionDecoder) SubmitRawTransaction(wrapper openwallet.Walle
 	return tx, nil
 }
 
+//GetRawTransactionFeeRate 获取交易单的费率
+func (decoder *TransactionDecoder) GetRawTransactionFeeRate() (string, string, error) {
+	_, feeRate, err := decoder.wm.EstimateFee(decimal.Zero)
+	if err != nil {
+		return "", "", err
+	}
+
+	return feeRate.String(), "Gas", nil
+}
+
 // getAssetsAccountUnspentSatisfyAmount
 func (decoder *TransactionDecoder) getUTXOSatisfyAmount(currentHeight uint64, unspents []*Unspent, amount decimal.Decimal) (*Unspent, *openwallet.Error) {
 
