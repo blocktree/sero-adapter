@@ -50,22 +50,22 @@ func (sub *subscriberSingle) BlockExtractDataNotify(sourceKey string, data *open
 
 	log.Std.Notice("data.Transaction: %+v", data.Transaction)
 
-	balance, err := sub.manager.GetAssetsAccountBalance(testApp, "", sourceKey)
-	if err != nil {
-		log.Errorf("GetAssetsAccountBalance failed, err: %v", err)
-	}
-
-	log.Std.Notice("balance: %s", balance.Balance)
-
-	if data.Transaction.Coin.IsContract {
-
-		balance, err := sub.manager.GetAssetsAccountTokenBalance(testApp, "", sourceKey, data.Transaction.Coin.Contract)
-		if err != nil {
-			log.Errorf("GetAssetsAccountTokenBalance failed, err: %v", err)
-		}
-
-		log.Std.Notice("%s balance: %s", balance.Contract.Token, balance.Balance.Balance)
-	}
+	//balance, err := sub.manager.GetAssetsAccountBalance(testApp, "", sourceKey)
+	//if err != nil {
+	//	log.Errorf("GetAssetsAccountBalance failed, err: %v", err)
+	//}
+	//
+	//log.Std.Notice("balance: %s", balance.Balance)
+	//
+	//if data.Transaction.Coin.IsContract {
+	//
+	//	balance, err := sub.manager.GetAssetsAccountTokenBalance(testApp, "", sourceKey, data.Transaction.Coin.Contract)
+	//	if err != nil {
+	//		log.Errorf("GetAssetsAccountTokenBalance failed, err: %v", err)
+	//	}
+	//
+	//	log.Std.Notice("%s balance: %s", balance.Contract.Token, balance.Balance.Balance)
+	//}
 
 	return nil
 }
@@ -123,7 +123,7 @@ func TestSubscribeAddress(t *testing.T) {
 	wrapper := &walletWrapper{wm: tw}
 	scanner.SetBlockScanWalletDAI(wrapper)
 
-	scanner.SetRescanBlockHeight(1656298)
+	//scanner.SetRescanBlockHeight(1658105)
 
 	scanner.Run()
 
@@ -133,8 +133,20 @@ func TestSubscribeAddress(t *testing.T) {
 func TestSubscribeScanBlock(t *testing.T) {
 
 	var (
-		symbol = "SERO"
+		symbol     = "SERO"
+		addrs      = map[string]string{
+			"7EHTPNYhKNuULtwQEgFK3NuYbf3qAGNoowRHo5BHZij3mdB7WJxZ4oRJt91HbVL88pxDmBV159MsTjiwzRMD7FgqideToxcNK63VPU7LJ9ff37kJ38Yx41cSBXgdAhFRwJy": "2kfDs5Ptb1nybNnJx2TTBcRiWpmsb5wrzowQfhFjv4J8jEGSMxu7xxVSYAY32RGdefCbucDKPtiqJYjtrnksiiYL",
+		}
 	)
+
+	//GetSourceKeyByAddress 获取地址对应的数据源标识
+	scanTargetFunc := func(scanTarget openwallet.ScanTarget) (string, bool) {
+		key, ok := addrs[scanTarget.Address]
+		if !ok {
+			return "", false
+		}
+		return key, true
+	}
 
 	assetsMgr, err := openw.GetAssetsAdapter(symbol)
 	if err != nil {
@@ -163,10 +175,11 @@ func TestSubscribeScanBlock(t *testing.T) {
 		return
 	}
 
-	scanner.SetBlockScanTargetFunc(test_scanTargetFunc)
+	scanner.SetBlockScanTargetFunc(scanTargetFunc)
+	//scanner.SetBlockScanTargetFunc(test_scanTargetFunc)
 
 	sub := subscriberSingle{manager: tw}
 	scanner.AddObserver(&sub)
 
-	scanner.ScanBlock(1649219)
+	scanner.ScanBlock(1656880)
 }

@@ -172,7 +172,7 @@ func TestWalletManager_Seed2Sk(t *testing.T) {
 }
 
 func TestWalletManager_ListUnspent(t *testing.T) {
-	tk := "4gbLYX9shEoABGKaZrbTmAfHRXPKkVK6wudFEp7miNFZ7F9ZCL6t38Nr6tSr8GDS11tNZn7iwghsbt2qs6P1bkje"
+	tk := "2kfDs5Ptb1nybNnJx2TTBcRiWpmsb5wrzowQfhFjv4J8jEGSMxu7xxVSYAY32RGdefCbucDKPtiqJYjtrnksiiYL"
 	currency := "SERO"
 	unspent, err := tw.ListUnspent(tk, currency, 0, -1)
 	if err != nil {

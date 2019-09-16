@@ -206,6 +206,9 @@ func (bs *SEROBlockScanner) ScanBlockTask() {
 			bs.newBlockNotify(block, isFork)
 		}
 	}
+
+	//重扫失败区块
+	bs.RescanFailedRecord()
 }
 
 //newBlockNotify 获得新区块后，通知给观测者
@@ -502,6 +505,10 @@ func (bs *SEROBlockScanner) extractTransaction(block *BlockData, trx *gjson.Resu
 					Status:      openwallet.TxStatusSuccess,
 					TxType:      txType,
 				}
+
+				wxID := openwallet.GenTransactionWxID(extractData.Transaction)
+				extractData.Transaction.WxID = wxID
+
 			} else {
 				extractData.Transaction.From = from
 			}
@@ -754,6 +761,7 @@ func (bs *SEROBlockScanner) newExtractDataNotify(height uint64, tokenExtractData
 
 		for _, extractData := range tokenExtractData {
 			for key, data := range extractData {
+				bs.wm.Log.Infof("newExtractDataNotify txid: %s", data.Transaction.TxID)
 				err := o.BlockExtractDataNotify(key, data)
 				if err != nil {
 					bs.wm.Log.Error("BlockExtractDataNotify unexpected error:", err)
@@ -922,4 +930,56 @@ func (bs *SEROBlockScanner) GetScannedBlockHeader() (*openwallet.BlockHeader, er
 	}
 
 	return &openwallet.BlockHeader{Height: blockHeight, Hash: hash}, nil
+}
+
+//rescanFailedRecord 重扫失败记录
+func (bs *SEROBlockScanner) RescanFailedRecord() {
+
+	var (
+		blockMap = make(map[uint64][]string)
+	)
+
+	list, err := bs.GetUnscanRecords()
+	if err != nil {
+		bs.wm.Log.Std.Info("block scanner can not get rescan data; unexpected error: %v", err)
+	}
+
+	//组合成批处理
+	for _, r := range list {
+
+		if _, exist := blockMap[r.BlockHeight]; !exist {
+			blockMap[r.BlockHeight] = make([]string, 0)
+		}
+
+		if len(r.TxID) > 0 {
+			arr := blockMap[r.BlockHeight]
+			arr = append(arr, r.TxID)
+
+			blockMap[r.BlockHeight] = arr
+		}
+	}
+
+	for height, _ := range blockMap {
+
+		if height == 0 {
+			continue
+		}
+
+		bs.wm.Log.Std.Info("block scanner rescanning height: %d ...", height)
+
+		block, err := bs.wm.GetBlockByNumber(height)
+		if err != nil {
+			bs.wm.Log.Std.Info("block scanner can not get new block data; unexpected error: %v", err)
+			continue
+		}
+
+		err = bs.BatchExtractTransactions(block)
+		if err != nil {
+			bs.wm.Log.Std.Info("block scanner can not extractRechargeRecords; unexpected error: %v", err)
+			continue
+		}
+
+		//删除未扫记录
+		bs.DeleteUnscanRecord(height)
+	}
 }

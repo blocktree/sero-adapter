@@ -76,6 +76,18 @@ func (bs *SEROBlockScanner) GetLocalBlock(height uint64) (*BlockData, error) {
 	return &blockHeader, nil
 }
 
+
+//获取未扫记录
+func (bs *SEROBlockScanner) GetUnscanRecords() ([]*UnscanRecord, error) {
+
+	var list []*UnscanRecord
+	err := bs.wm.blockChainDB.All(&list)
+	if err != nil {
+		return nil, err
+	}
+	return list, nil
+}
+
 //SaveUnscanRecord 保存交易记录到钱包数据库
 func (bs *SEROBlockScanner) SaveUnscanRecord(record *UnscanRecord) error {
 
@@ -171,11 +183,15 @@ func (bs *SEROBlockScanner) DeleteUnspent(nilKey string) error {
 		return err
 	}
 
+	//bs.wm.Log.Infof("delete utxo = %s", root)
+
 	//删除utxo与nil的关联记录
 	err = tx.Delete(NilKeyBucket, nilKey)
 	if err != nil {
 		return err
 	}
+
+	//bs.wm.Log.Infof("delete nilKey = %s", nilKey)
 
 	return tx.Commit()
 }
