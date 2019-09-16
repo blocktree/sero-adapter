@@ -185,7 +185,7 @@ func TestWalletManager_ListUnspent(t *testing.T) {
 }
 
 func TestWalletManager_ListUnspentByAddress(t *testing.T) {
-	address := "GUZ3K7iLmyuUnV4sGMZDG5E5GXd9dPanhHGAmxNnKVjfn9JvkMSPmm5PWXpmXjjhE2uzAWVaoPApqsLcqi9iawwinuoDp68vWC9Z4FPjpDMV4jVWL1kbVWLEAL6tzcN3gbv"
+	address := "pe6EgzWkkg3pwXqiKLPWUaX8wWvpW1qpYYgD9Bw1STSy2p51oexdhaxvT8jPwiCDZWckDKDM96r2NbfcowA15VHFA7RzjpzEXrY6"
 	currency := "SERO"
 	unspent, err := tw.ListUnspentByAddress(address, currency, 0, -1)
 	if err != nil {

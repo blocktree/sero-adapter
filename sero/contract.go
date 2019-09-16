@@ -38,11 +38,11 @@ func (decoder *ContractDecoder) GetTokenBalanceByAddress(contract openwallet.Sma
 	var tokenBalanceList []*openwallet.TokenBalance
 
 	for _, addr := range address {
-		log.Infof("GetTokenBalanceByAddress: %s", addr)
+		//log.Infof("GetTokenBalanceByAddress: %s", addr)
 		utxo, err := decoder.wm.ListUnspentByAddress(addr, contract.Address, 0, -1)
 		if err != nil {
-			log.Errorf("ListUnspentByAddress failed, err: %v", err)
-			return nil, nil
+			log.Debugf("ListUnspentByAddress failed, err: %v", err)
+			//return nil, nil
 		}
 
 		obj := &openwallet.Balance{}

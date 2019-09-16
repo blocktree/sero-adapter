@@ -123,7 +123,7 @@ func TestSubscribeAddress(t *testing.T) {
 	wrapper := &walletWrapper{wm: tw}
 	scanner.SetBlockScanWalletDAI(wrapper)
 
-	scanner.SetRescanBlockHeight(1649200)
+	scanner.SetRescanBlockHeight(1656298)
 
 	scanner.Run()
 

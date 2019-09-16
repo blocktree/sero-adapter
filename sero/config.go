@@ -12,6 +12,7 @@ const (
 	Symbol    = "SERO"
 	CurveType = owcrypt.ECC_CURVE_SECP256K1
 	MaxTxInputs = 200
+	MinConfirms = uint64(12)
 )
 
 type WalletConfig struct {

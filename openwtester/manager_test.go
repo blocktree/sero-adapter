@@ -74,11 +74,11 @@ func TestWalletManager_GetWalletList(t *testing.T) {
 
 func TestWalletManager_CreateAssetsAccount(t *testing.T) {
 
-	tm := testInitWalletManager()
+	//tm := testInitWalletManager()
 
 	walletID := "W3TuDqe8VShgyPcg2dw4FRrNQbmxxiGPTJ"
-	account := &openwallet.AssetsAccount{Alias: "mainnetSERO", WalletID: walletID, Required: 1, Symbol: "SERO", IsTrust: true}
-	account, address, err := SERO_CreateAssetsAccount(testApp, walletID, "12345678", account, tm)
+	account := &openwallet.AssetsAccount{Alias: "sumSERO", WalletID: walletID, Required: 1, Symbol: "SERO", IsTrust: true}
+	account, address, err := SERO_CreateAssetsAccount(testApp, walletID, "12345678", account, tw)
 	if err != nil {
 		log.Error(err)
 		return
@@ -87,7 +87,7 @@ func TestWalletManager_CreateAssetsAccount(t *testing.T) {
 	log.Info("account:", account)
 	log.Info("address:", address)
 
-	tm.CloseDB(testApp)
+	tw.CloseDB(testApp)
 }
 
 func TestWalletManager_GetAssetsAccountList(t *testing.T) {
@@ -132,11 +132,11 @@ func TestWalletManager_CreateAddress(t *testing.T) {
 
 func TestWalletManager_GetAddressList(t *testing.T) {
 
-	tm := testInitWalletManager()
+	//tm := testInitWalletManager()
 
 	walletID := "W3TuDqe8VShgyPcg2dw4FRrNQbmxxiGPTJ"
 	accountID := "3D58HdM35ZJrMgAzzRduGy6mPVqc8yeGNFm5kNBU16tZYkf84N9C4uppHtJWfw6bEXMtkFgXTxPnw3kN9m7QhiX2"
-	list, err := tm.GetAddressList(testApp, walletID, accountID, 0, -1, false)
+	list, err := tw.GetAddressList(testApp, walletID, accountID, 0, -1, false)
 	if err != nil {
 		log.Error("unexpected error:", err)
 		return
@@ -148,7 +148,7 @@ func TestWalletManager_GetAddressList(t *testing.T) {
 	}
 	log.Info("address count:", len(list))
 
-	tm.CloseDB(testApp)
+	tw.CloseDB(testApp)
 }
 
 

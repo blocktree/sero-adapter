@@ -851,11 +851,11 @@ func (bs *SEROBlockScanner) GetBalanceByAddress(address ...string) ([]*openwalle
 	addrBalanceArr := make([]*openwallet.Balance, 0)
 
 	for _, addr := range address {
-		log.Infof("GetTokenBalanceByAddress: %s", addr)
+		//log.Infof("GetTokenBalanceByAddress: %s", addr)
 		utxo, err := bs.wm.ListUnspentByAddress(addr, bs.wm.Symbol(), 0, -1)
 		if err != nil {
-			log.Errorf("ListUnspentByAddress failed, err: %v", err)
-			return nil, nil
+			log.Debugf("ListUnspentByAddress failed, err: %v", err)
+			//return nil, nil
 		}
 
 		obj := &openwallet.Balance{}

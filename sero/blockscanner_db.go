@@ -17,6 +17,7 @@ package sero
 
 import (
 	"errors"
+	"github.com/asdine/storm/q"
 )
 
 const (
@@ -222,5 +223,38 @@ func (wm *WalletManager) LockUnspent(root string) error {
 		return err
 	}
 
+	return nil
+}
+
+
+// UnlockUnspent 解锁已超时发送的未花记录
+func (wm *WalletManager) UnlockUnspent(currentHeight uint64) error {
+
+	db := wm.unspentDB
+
+	var (
+		utxo []*Unspent
+		err error
+	)
+
+	err = wm.unspentDB.Select(
+		q.And(
+			q.Eq("Sending", true),
+		)).Find(&utxo)
+	if err != nil {
+		return err
+	}
+
+	for _, u := range utxo {
+		confirms := currentHeight - u.Height
+		//发送中的未花确认数
+		if confirms > MinConfirms {
+			u.Sending = false
+			err = db.Save(&utxo)
+			if err != nil {
+				return err
+			}
+		}
+	}
 	return nil
 }

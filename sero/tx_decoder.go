@@ -23,10 +23,6 @@ import (
 	"time"
 )
 
-const (
-	MinConfirms = uint64(12)
-)
-
 type TransactionDecoder struct {
 	openwallet.TransactionDecoderBase
 	wm *WalletManager //钱包管理者
@@ -332,6 +328,7 @@ func (decoder *TransactionDecoder) CreateSummaryRawTransactionWithError(wrapper 
 		sumAmount        = decimal.Zero
 		minTransfer, _   = decimal.NewFromString(sumRawTx.MinTransfer)
 		rawTxArray       = make([]*openwallet.RawTransactionWithError, 0)
+		usedUTXO         = make([]*Unspent, 0)
 	)
 
 	if sumRawTx.Coin.IsContract {
@@ -382,6 +379,8 @@ func (decoder *TransactionDecoder) CreateSummaryRawTransactionWithError(wrapper 
 			} else {
 				txFrom = append(txFrom, fmt.Sprintf("%s:%s", u.Address, ua.String()))
 			}
+
+			usedUTXO = append(usedUTXO, u)
 		}
 	}
 
@@ -405,7 +404,7 @@ func (decoder *TransactionDecoder) CreateSummaryRawTransactionWithError(wrapper 
 		}
 
 		//手续费地址utxo作为输入
-		tokenUnspents = append(tokenUnspents, supportUnspent)
+		usedUTXO = append(usedUTXO, supportUnspent)
 
 		supportAmount, _ := decimal.NewFromString(supportUnspent.Value)
 		supportAmount = supportAmount.Shift(-decoder.wm.Decimal())
@@ -469,9 +468,9 @@ func (decoder *TransactionDecoder) CreateSummaryRawTransactionWithError(wrapper 
 	decoder.wm.Log.Std.Notice("Fees: %v", fees.String())
 	decoder.wm.Log.Std.Notice("-----------------------------------------------")
 
-	changeAddress := tokenUnspents[0].Address
+	changeAddress := usedUTXO[0].Address
 
-	txStruct, err := decoder.wm.GenTxParam(changeAddress, accountID, coinDecimals, feesRate, tokenUnspents, outputAddrs)
+	txStruct, err := decoder.wm.GenTxParam(changeAddress, accountID, coinDecimals, feesRate, usedUTXO, outputAddrs)
 	if err != nil {
 		return nil, err
 	}
@@ -495,7 +494,7 @@ func (decoder *TransactionDecoder) CreateSummaryRawTransactionWithError(wrapper 
 	//装配签名
 	keySigs := make([]*openwallet.KeySignature, 0)
 
-	for _, u := range tokenUnspents {
+	for _, u := range usedUTXO {
 
 		addr, err := wrapper.GetAddress(u.Address)
 		if err != nil {

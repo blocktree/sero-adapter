@@ -121,7 +121,7 @@ func testSubmitTransactionStep(tm *openw.WalletManager, rawTx *openwallet.RawTra
 func TestTransfer(t *testing.T) {
 
 	targets := []string{
-		//"wUysiDBai1jZ9Tab93DH3uRy6TMFH6DpBA6aQQZSXCAu5zNumRdx5QujBj3uoz39roP11oyEsQXCawG3Gi43x7dP8mJeAC5hG1TdVSbMmuhuc3DmvTbLKyNjU1w8TgRnyWp",
+		"wUysiDBai1jZ9Tab93DH3uRy6TMFH6DpBA6aQQZSXCAu5zNumRdx5QujBj3uoz39roP11oyEsQXCawG3Gi43x7dP8mJeAC5hG1TdVSbMmuhuc3DmvTbLKyNjU1w8TgRnyWp",
 		//"wkxJT5KkTLw6fbS2VCbw8CcZgUkgUtgDDPkCxjFPkaCSHCk8ADDij7NRwSE6agXCSdSHUHUh5L2gX3wYb8PTLo1KPpEXv1Fz2V6nB6Hs4ia22SZEA1GjPCfYV8nZnkTJ4HD",
 		//"wpdAANC4M1wxvzdwR6wBD8tDDc3E4utZcNF57t54W6tKuztjkiNGHZbxpuMpMUWWexdarY9i5RzPFvCzY5NEPmz5L9jb7ch68Xy2H3zrAsggVGNFcApS82GXpVVdEa8YiHL",
 		//"wzfxZiuTMgL1ScM5GvVzLjC7L9ocAAsfFdvsEUX68TazmPQNkryxuF5ULpqyt3rzMT2Rhe3vet2aSKcLLcth48vf3nZis7KMX6WicxzWoBS8fSXs7fWSFPofwL5q58DCBZb",
@@ -137,7 +137,7 @@ func TestTransfer(t *testing.T) {
 		//"zxPiJnvqXCYgkSYfjPPg2y8EBbSTVE41We2Y3LxhaMMqzsr6i9vE8hS8kQAXw9DML3nMiwxqE9StWPVLC9ibQCbPfxWzBuM6VfvEtnLPKiDe9Kgo7Ap9ARKzUM1LKChcDM7",
 		//"zxtHrpvVY1nAMjBcKGV6fsjaLUn7thruPWHMr2ckRhW7ZUphgN9RbaUpnr5pu4t3xJEAEqhUcaVSztpFZS9f2Cr6nxr9dBvVUgRGA9czvMBWCmiWPYb8z1XSiruJQgWC5XL",
 
-		"pe6EgzWkkg3pwXqiKLPWUaX8wWvpW1qpYYgD9Bw1STSy2p51oexdhaxvT8jPwiCDZWckDKDM96r2NbfcowA15VHFA7RzjpzEXrY6E5pwFAK9HahG3Po3pYLoZFn55hjQ1yW",
+		//"f6YUwuMmo8aSanyhokVnGTMxge5YSFvrgeEfotqK3bYTPDJ9U99KFx2j3iFHpTxkY9VN98fvx67mFHUm8BybuJ8nyUvF1oAcH2ukmGCYnd3aEQ3mFBtsYUxxa2kesfAyBRo",
 	}
 
 	walletID := "W3TuDqe8VShgyPcg2dw4FRrNQbmxxiGPTJ"
@@ -176,7 +176,7 @@ func TestTransfer(t *testing.T) {
 func TestTransfer_Token(t *testing.T) {
 
 	targets := []string{
-		//"wUysiDBai1jZ9Tab93DH3uRy6TMFH6DpBA6aQQZSXCAu5zNumRdx5QujBj3uoz39roP11oyEsQXCawG3Gi43x7dP8mJeAC5hG1TdVSbMmuhuc3DmvTbLKyNjU1w8TgRnyWp",
+		"wUysiDBai1jZ9Tab93DH3uRy6TMFH6DpBA6aQQZSXCAu5zNumRdx5QujBj3uoz39roP11oyEsQXCawG3Gi43x7dP8mJeAC5hG1TdVSbMmuhuc3DmvTbLKyNjU1w8TgRnyWp",
 		//"wkxJT5KkTLw6fbS2VCbw8CcZgUkgUtgDDPkCxjFPkaCSHCk8ADDij7NRwSE6agXCSdSHUHUh5L2gX3wYb8PTLo1KPpEXv1Fz2V6nB6Hs4ia22SZEA1GjPCfYV8nZnkTJ4HD",
 		//"wpdAANC4M1wxvzdwR6wBD8tDDc3E4utZcNF57t54W6tKuztjkiNGHZbxpuMpMUWWexdarY9i5RzPFvCzY5NEPmz5L9jb7ch68Xy2H3zrAsggVGNFcApS82GXpVVdEa8YiHL",
 		//"wzfxZiuTMgL1ScM5GvVzLjC7L9ocAAsfFdvsEUX68TazmPQNkryxuF5ULpqyt3rzMT2Rhe3vet2aSKcLLcth48vf3nZis7KMX6WicxzWoBS8fSXs7fWSFPofwL5q58DCBZb",
@@ -192,7 +192,7 @@ func TestTransfer_Token(t *testing.T) {
 		//"zxPiJnvqXCYgkSYfjPPg2y8EBbSTVE41We2Y3LxhaMMqzsr6i9vE8hS8kQAXw9DML3nMiwxqE9StWPVLC9ibQCbPfxWzBuM6VfvEtnLPKiDe9Kgo7Ap9ARKzUM1LKChcDM7",
 		//"zxtHrpvVY1nAMjBcKGV6fsjaLUn7thruPWHMr2ckRhW7ZUphgN9RbaUpnr5pu4t3xJEAEqhUcaVSztpFZS9f2Cr6nxr9dBvVUgRGA9czvMBWCmiWPYb8z1XSiruJQgWC5XL",
 
-		"pe6EgzWkkg3pwXqiKLPWUaX8wWvpW1qpYYgD9Bw1STSy2p51oexdhaxvT8jPwiCDZWckDKDM96r2NbfcowA15VHFA7RzjpzEXrY6E5pwFAK9HahG3Po3pYLoZFn55hjQ1yW",
+		//"f6YUwuMmo8aSanyhokVnGTMxge5YSFvrgeEfotqK3bYTPDJ9U99KFx2j3iFHpTxkY9VN98fvx67mFHUm8BybuJ8nyUvF1oAcH2ukmGCYnd3aEQ3mFBtsYUxxa2kesfAyBRo",
 	}
 
 	walletID := "W3TuDqe8VShgyPcg2dw4FRrNQbmxxiGPTJ"
