@@ -579,9 +579,14 @@ func (bs *SEROBlockScanner) extractTxInput(block *BlockData, trx *gjson.Result, 
 			if txsDB != nil {
 				bs.wm.Log.Infof("GetTransactionByTxID found: %s", txid)
 				for _, txDB := range txsDB {
+					bs.wm.Log.Debugf("txDB Symbol: %s", txDB.Coin.Symbol)
+					bs.wm.Log.Debugf("txDB Address: %s", txDB.Coin.Contract.Address)
+					bs.wm.Log.Debugf("txDB ContractID: %s", txDB.Coin.Contract.ContractID)
 					currency := ""
 					if txDB.Coin.IsContract {
 						currency = txDB.Coin.Contract.Address
+						contractID := openwallet.GenContractID(txDB.Coin.Symbol, txDB.Coin.Contract.Address)
+						txDB.Coin.Contract.ContractID = contractID
 					} else {
 						currency = txDB.Coin.Symbol
 					}

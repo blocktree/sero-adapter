@@ -71,7 +71,7 @@ func TestSEROBlockScanner_GetOut(t *testing.T) {
 func TestWalletManager_DecOut(t *testing.T) {
 
 	blockHeight := []uint64{
-		1659125,
+		1664944,
 	}
 
 	tk := "2kfDs5Ptb1nybNnJx2TTBcRiWpmsb5wrzowQfhFjv4J8jEGSMxu7xxVSYAY32RGdefCbucDKPtiqJYjtrnksiiYL"
