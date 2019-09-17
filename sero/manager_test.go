@@ -173,7 +173,7 @@ func TestWalletManager_Seed2Sk(t *testing.T) {
 
 func TestWalletManager_ListUnspent(t *testing.T) {
 	tk := "2kfDs5Ptb1nybNnJx2TTBcRiWpmsb5wrzowQfhFjv4J8jEGSMxu7xxVSYAY32RGdefCbucDKPtiqJYjtrnksiiYL"
-	currency := "SERO"
+	currency := "AIPP"
 	unspent, err := tw.ListUnspent(tk, currency, 0, -1)
 	if err != nil {
 		t.Errorf("ListUnspent failed, error: %v", err)
@@ -185,8 +185,8 @@ func TestWalletManager_ListUnspent(t *testing.T) {
 }
 
 func TestWalletManager_ListUnspentByAddress(t *testing.T) {
-	address := "pe6EgzWkkg3pwXqiKLPWUaX8wWvpW1qpYYgD9Bw1STSy2p51oexdhaxvT8jPwiCDZWckDKDM96r2NbfcowA15VHFA7RzjpzEXrY6"
-	currency := "SERO"
+	address := "7EHTPNYhKNuULtwQEgFK3NuYbf3qAGNoowRHo5BHZij3mdB7WJxZ4oRJt91HbVL88pxDmBV159MsTjiwzRMD7FgqideToxcNK63VPU7LJ9ff37kJ38Yx41cSBXgdAhFRwJy"
+	currency := "AIPP"
 	unspent, err := tw.ListUnspentByAddress(address, currency, 0, -1)
 	if err != nil {
 		t.Errorf("ListUnspent failed, error: %v", err)
@@ -196,3 +196,4 @@ func TestWalletManager_ListUnspentByAddress(t *testing.T) {
 		log.Infof("utxo = %+v", utxo)
 	}
 }
+

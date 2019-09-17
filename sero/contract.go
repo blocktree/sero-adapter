@@ -57,6 +57,7 @@ func (decoder *ContractDecoder) GetTokenBalanceByAddress(contract openwallet.Sma
 		obj.Address = addr
 		obj.ConfirmBalance = tb.String()
 		obj.Balance = obj.ConfirmBalance
+		obj.UnconfirmBalance = "0"
 
 		tokenBalance := &openwallet.TokenBalance{
 			Contract: &contract,
