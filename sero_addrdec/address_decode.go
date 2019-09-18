@@ -71,7 +71,49 @@ func (dec *AddressDecoderV2) CustomCreateAddress(account *openwallet.AssetsAccou
 		PublicKey: account.PublicKey,
 		Alias:     "",
 		Tag:       "",
-		HDPath:    "",
+		HDPath:    account.HDPath,
+		IsChange:  false,
+	}
+
+	return newAddr, nil
+}
+
+
+func (dec *AddressDecoderV2) CreateFixAddress(account *openwallet.AssetsAccount, rnd []byte, newIndex uint64) (*openwallet.Address, error) {
+
+	if dec.Client == nil {
+		return nil, fmt.Errorf("sero client is nil")
+	}
+
+	address, err := dec.Client.LocalPk2Pkr(account.PublicKey, hexutil.Encode(rnd))
+	if err != nil {
+		return nil, err
+	}
+
+	//publickey, err := base58.Decode(account.PublicKey)
+	//if err != nil {
+	//	result.Success = false
+	//	result.Err = err
+	//	return result
+	//}
+	//
+	//var pk keys.Uint512
+	//copy(pk[:], publickey[:])
+	//rnd := keys.RandUint256()
+	//pkr := keys.Addr2PKr(&pk, &rnd) //收款码
+	//address := base58.Encode(pkr[:])
+
+	newAddr := &openwallet.Address{
+		AccountID: account.AccountID,
+		Symbol:    account.Symbol,
+		Index:     newIndex,
+		Address:   address,
+		Balance:   "0",
+		WatchOnly: false,
+		PublicKey: account.PublicKey,
+		Alias:     "",
+		Tag:       "",
+		HDPath:    account.HDPath,
 		IsChange:  false,
 	}
 

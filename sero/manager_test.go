@@ -16,6 +16,7 @@
 package sero
 
 import (
+	"encoding/hex"
 	"fmt"
 	"github.com/astaxie/beego/config"
 	"github.com/blocktree/openwallet/common"
@@ -152,6 +153,29 @@ func TestWalletManager_CreateAddress(t *testing.T) {
 	fmt.Printf("%s\n", addr.Address)
 }
 
+
+func TestWalletManager_CreateFixAddress(t *testing.T) {
+
+	key := testGetLocalKeyByKeyID("W3KUZGQqWYmPUanYfHth5A4tMuuZ2Uo7t5")
+	name := "sero"
+	account, err := tw.CreateAccount(name, key, 0)
+	if err != nil {
+		t.Errorf("CreateAccount failed, error: %v", err)
+		return
+	}
+
+	rnd, _ := hex.DecodeString("0f15135ce7333a2c11962803cd1ab905dd640954ebbebf1af3925c5347ea720a")
+	log.Infof("rnd: %s", rnd)
+
+	addr, err := tw.CreateFixAddress(account, rnd, 0)
+	if err != nil {
+		t.Errorf("CreateAccount failed, error: %v", err)
+		return
+	}
+
+	fmt.Printf("%s\n", addr.Address)
+}
+
 func TestWalletManager_GasPrice(t *testing.T) {
 	gasPrice, err := tw.GasPrice()
 	if err != nil {
@@ -195,5 +219,16 @@ func TestWalletManager_ListUnspentByAddress(t *testing.T) {
 	for _, utxo := range unspent {
 		log.Infof("utxo = %+v", utxo)
 	}
+}
+
+func TestWalletManager_CreateRootAccount(t *testing.T) {
+	key := testGetLocalKeyByKeyID("W3KUZGQqWYmPUanYfHth5A4tMuuZ2Uo7t5")
+	name := "sero"
+	account, err := tw.CreateRootAccount(name, key)
+	if err != nil {
+		t.Errorf("CreateAccount failed, error: %v", err)
+		return
+	}
+	log.Infof("account: %+v", account)
 }
 

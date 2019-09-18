@@ -118,8 +118,62 @@ func (wm *WalletManager) CreateAccount(alias string, key *hdkeystore.HDKey, newA
 
 }
 
+
+// 创建账户 CreateRootAccount
+func (wm *WalletManager) CreateRootAccount(alias string, key *hdkeystore.HDKey) (*openwallet.AssetsAccount, error) {
+
+	account := &openwallet.AssetsAccount{}
+
+	account.Alias = alias
+	account.Symbol = wm.Symbol()
+	account.Required = 1
+	// root/n' , 使用强化方案
+	account.HDPath = key.RootPath
+
+	childKey, err := key.DerivedKeyWithPath(account.HDPath, wm.CurveType())
+	if err != nil {
+		return nil, err
+	}
+
+	//账户扩展得到的私钥
+	owprv, err := childKey.GetPrivateKeyBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	//把账户扩展得到的私钥作为sero的种子
+	sk, err := wm.LocalSeed2Sk(hexutil.Encode(owprv[:])) //私钥
+	if err != nil {
+		return nil, err
+	}
+
+	tk, err := wm.LocalSk2Tk(sk) //跟踪公钥
+	if err != nil {
+		return nil, err
+	}
+
+	pk, err := wm.LocalTk2Pk(tk) //公钥
+	if err != nil {
+		return nil, err
+	}
+
+	account.AccountID = tk //跟踪公钥作为accountID
+	account.PublicKey = pk //sero公钥作为账户公钥
+	account.Index = 0
+	account.AddressIndex = -1
+	account.WalletID = key.KeyID
+
+	return account, nil
+
+}
+
+
 func (wm *WalletManager) CreateAddress(account *openwallet.AssetsAccount, newIndex uint64) (*openwallet.Address, error) {
 	return wm.Decoder.CustomCreateAddress(account, newIndex)
+}
+
+func (wm WalletManager) CreateFixAddress(account *openwallet.AssetsAccount, rnd []byte, newIndex uint64) (*openwallet.Address, error) {
+	return wm.Decoder.CreateFixAddress(account, rnd, newIndex)
 }
 
 func (wm *WalletManager) GetBlocksInfo(height uint64) (*Block, error) {
