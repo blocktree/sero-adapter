@@ -137,7 +137,7 @@ func TestTransfer(t *testing.T) {
 		//"zxPiJnvqXCYgkSYfjPPg2y8EBbSTVE41We2Y3LxhaMMqzsr6i9vE8hS8kQAXw9DML3nMiwxqE9StWPVLC9ibQCbPfxWzBuM6VfvEtnLPKiDe9Kgo7Ap9ARKzUM1LKChcDM7",
 		//"zxtHrpvVY1nAMjBcKGV6fsjaLUn7thruPWHMr2ckRhW7ZUphgN9RbaUpnr5pu4t3xJEAEqhUcaVSztpFZS9f2Cr6nxr9dBvVUgRGA9czvMBWCmiWPYb8z1XSiruJQgWC5XL",
 
-		"7EHTPNYhKNuULtwQEgFK3NuYbf3qAGNoowRHo5BHZij3mdB7WJxZ4oRJt91HbVL88pxDmBV159MsTjiwzRMD7FgqideToxcNK63VPU7LJ9ff37kJ38Yx41cSBXgdAhFRwJy",
+		"HefQtqjB3YqNrh4RwUcjMhQQnRBhKLMEdbnKUtFfEoruFjCyCA3gMAtzRFyQJENgEJtr9zFod2A9aHc81SVR8uwufAsQxbkitx7rz2mQspeRrXnG2KimkWwMbxMjwxQSAKF",
 	}
 
 	walletID := "W3TuDqe8VShgyPcg2dw4FRrNQbmxxiGPTJ"
@@ -192,7 +192,7 @@ func TestTransfer_Token(t *testing.T) {
 		//"zxPiJnvqXCYgkSYfjPPg2y8EBbSTVE41We2Y3LxhaMMqzsr6i9vE8hS8kQAXw9DML3nMiwxqE9StWPVLC9ibQCbPfxWzBuM6VfvEtnLPKiDe9Kgo7Ap9ARKzUM1LKChcDM7",
 		//"zxtHrpvVY1nAMjBcKGV6fsjaLUn7thruPWHMr2ckRhW7ZUphgN9RbaUpnr5pu4t3xJEAEqhUcaVSztpFZS9f2Cr6nxr9dBvVUgRGA9czvMBWCmiWPYb8z1XSiruJQgWC5XL",
 
-		"7EHTPNYhKNuULtwQEgFK3NuYbf3qAGNoowRHo5BHZij3mdB7WJxZ4oRJt91HbVL88pxDmBV159MsTjiwzRMD7FgqideToxcNK63VPU7LJ9ff37kJ38Yx41cSBXgdAhFRwJy",
+		"HefQtqjB3YqNrh4RwUcjMhQQnRBhKLMEdbnKUtFfEoruFjCyCA3gMAtzRFyQJENgEJtr9zFod2A9aHc81SVR8uwufAsQxbkitx7rz2mQspeRrXnG2KimkWwMbxMjwxQSAKF",
 	}
 
 	walletID := "W3TuDqe8VShgyPcg2dw4FRrNQbmxxiGPTJ"

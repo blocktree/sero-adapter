@@ -377,6 +377,7 @@ func (bs *SEROBlockScanner) extractTransaction(block *BlockData, trx *gjson.Resu
 
 	var (
 		success = true
+		isTokenTrasfer = false
 	)
 
 	//手续费
@@ -448,7 +449,7 @@ func (bs *SEROBlockScanner) extractTransaction(block *BlockData, trx *gjson.Resu
 	}
 
 	//提取input部分记录
-	tokenExtractInput, err := bs.extractTxInput(block, trx, scanTargetFunc)
+	tokenExtractInput, isTokenTrasfer, err := bs.extractTxInput(block, trx, scanTargetFunc)
 	if err != nil {
 		bs.wm.Log.Std.Info("block scanner can not extract transaction data; unexpected error: %v", err)
 		result.Success = false
@@ -505,7 +506,7 @@ func (bs *SEROBlockScanner) extractTransaction(block *BlockData, trx *gjson.Resu
 					Status:      openwallet.TxStatusSuccess,
 					TxType:      txType,
 				}
-
+				extractData.Transaction.TxType = txType
 				wxID := openwallet.GenTransactionWxID(extractData.Transaction)
 				extractData.Transaction.WxID = wxID
 
@@ -522,10 +523,11 @@ func (bs *SEROBlockScanner) extractTransaction(block *BlockData, trx *gjson.Resu
 }
 
 //ExtractTxInput 提取交易单输入部分
-func (bs *SEROBlockScanner) extractTxInput(block *BlockData, trx *gjson.Result, scanTargetFunc openwallet.BlockScanTargetFunc) (map[string]ExtractInput, error) {
+func (bs *SEROBlockScanner) extractTxInput(block *BlockData, trx *gjson.Result, scanTargetFunc openwallet.BlockScanTargetFunc) (map[string]ExtractInput, bool, error) {
 
 	var (
 		tokenExtractInput = make(map[string]ExtractInput)
+		isTokenTrasfer = false
 	)
 
 	createAt := time.Now().Unix()
@@ -587,6 +589,9 @@ func (bs *SEROBlockScanner) extractTxInput(block *BlockData, trx *gjson.Result, 
 						currency = txDB.Coin.Contract.Address
 						contractID := openwallet.GenContractID(txDB.Coin.Symbol, txDB.Coin.Contract.Address)
 						txDB.Coin.Contract.ContractID = contractID
+						txDB.Coin.ContractID = contractID
+						txDB.Coin.IsContract = true
+						isTokenTrasfer = true
 					} else {
 						currency = txDB.Coin.Symbol
 					}
@@ -628,7 +633,7 @@ func (bs *SEROBlockScanner) extractTxInput(block *BlockData, trx *gjson.Result, 
 
 	}
 
-	return tokenExtractInput, nil
+	return tokenExtractInput, isTokenTrasfer, nil
 }
 
 //ExtractTxInput 提取交易单输出部分
