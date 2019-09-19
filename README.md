@@ -2,37 +2,107 @@
 
 sero-adapter适配了openwallet.AssetsAdapter接口，给应用提供了底层的区块链协议支持。
 
+## 部署gero local节点
 
-## 使用方法
+### linux
 
-1. 下载最新版的openw-sero和SERO.ini
+1. 安装gero
 
-https://github.com/blocktree/sero-adapter/releases
+```shell
 
-openw-sero与SERO.ini放在同一个目录中。
+# 环境准备：依次运行如下命令
+$ apt update
+$ apt install wget curl rsync libgmp-dev lrzsz -y
 
-2. 下载gero
+# 创建目录
+$ mkdir -p /data/sero/geroData
 
-https://github.com/sero-cash/go-sero/releases/tag/v1.0.0-rc11
+$ cd /data/sero
 
-3. 本地启动gero
+# 下载二进制文件
+$ wget https://sero-media-1256272584.cos.ap-shanghai.myqcloud.com/gero/v1.0.0-rc11/gero-v1.0.0-rc11-linux-amd64-v4.tar.gz
+
+# 添加环境变量
+$ vim ~/.bashrc
+
+# 之后按字母i后将光标放到最后一行，粘贴如下内容
+$ export DYLD_LIBRARY_PATH="/data/sero/geropkg/czero/lib/"
+$ export LD_LIBRARY_PATH="/data/sero/geropkg/czero/lib/"
+
+# 执行命令, 让其生效
+$ source ~/.bashrc
+
+# 检验生效的效果如下，执行命令
+$ echo $LD_LIBRARY_PATH
+# 输出如下内容： /data/sero/geropkg/czero/lib/
+
+#  部署依赖库libgomp.so.1.0.0
+# 首先检查执行命令
+$ ls -l /usr/lib/x86_64-linux-gnu/libgomp.so.1  
+
+# 如果现实如下信息，则无需再部署此依赖库
+lrwxrwxrwx 1 root root 16 Feb  6  2018 /usr/lib/x86_64-linux-gnu/libgomp.so.1 -> libgomp.so.1.0.0
+
+# 如果没显示上面的信息，则执行如下操作：
+$ wget https://github.com/blocktree/sero-adapter/releases/download/v1.0.12/libgomp.so.1.0.0.zip
+$ unzip libgomp.so.1.0.0.zip
+$ rsync -avz /data/sero/libgomp.so.1.0.0  /usr/lib/x86_64-linux-gnu/
+$ ln -s /usr/lib/x86_64-linux-gnu/libgomp.so.1.0.0  /usr/lib/x86_64-linux-gnu/libgomp.so.1
+
+# 本地启动gero
+nohup /data/sero/geropkg/bin/gero --mineMode --datadir "/data/sero/geroData" --nodiscover --rpc --rpcport 8545 --rpcapi "local,sero" --rpcaddr 127.0.0.1 --rpccorsdomain "*" --exchangeValueStr >> /data/sero/geroData/run.log 2>&1 &
+
+```
+
+2. 本地启动gero
+
+```shell
+
+# 本地启动gero
+nohup /data/sero/geropkg/bin/gero --mineMode --datadir "/data/sero/geroData" --nodiscover --rpc --rpcport 8545 --rpcapi "local,sero" --rpcaddr 127.0.0.1 --rpccorsdomain "*" --exchangeValueStr >> /data/sero/geroData/run.log 2>&1 &
+
+```
+
+### mac os
+
+1. 下载gero
+
+https://sero-media-1256272584.cos.ap-shanghai.myqcloud.com/gero/v1.0.0-rc11/gero-v1.0.0-rc11-darwin-amd64.tar.gz
+
+2. 本地启动gero
 
 打开终端，cd到geropkg目录下，执行命令：
 
 ```shell
 
-//导入c++库目录到环境变量
+# 导入c++库目录到环境变量
 $ export DYLD_LIBRARY_PATH="./czero/lib/"
 $ export LD_LIBRARY_PATH="./czero/lib/"
 
-//启动本地gero节点，这个节点不同步区块数据，只是提供密码算法
+# 启动本地gero节点，这个节点不同步区块数据，只是提供密码算法
 $ bin/gero --mineMode --datadir ~/geroData --nodiscover --rpc --rpcport 8545 --rpcapi local,sero --rpcaddr 127.0.0.1 --rpccorsdomain "*" --exchangeValueStr
-
-//后台运行gero
-$ nohup bin/gero --mineMode --datadir ~/geroData --nodiscover --rpc --rpcport 8545 --rpcapi local,sero --rpcaddr 127.0.0.1 --rpccorsdomain "*" --exchangeValueStr >> gero.log 2>&1 &
 
 ```
 
-4. 执行openw-sero创建钱包
+## 使用方法
 
-openw-sero是openw-cli的分支，操作命令完全一致。
+1. 下载最新版的openw-sero
+
+https://github.com/blocktree/sero-adapter/releases
+
+2. 创建SERO.ini配置文件，与openw-sero放在同一个目录中。
+
+SERO.ini内容：
+
+```ini
+
+# Remote Server RPC api url
+serverAPI = "http://127.0.0.1:8545"
+# fix gas for transaction
+fixGas = 25000
+# Cache data file directory, default = "", current directory: ./data
+dataDir = ""
+
+```
+
+3. openw-sero是openw-cli的分支，操作命令完全一致。

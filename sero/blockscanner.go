@@ -889,6 +889,7 @@ func (bs *SEROBlockScanner) GetBalanceByAddress(address ...string) ([]*openwalle
 		obj.Address = addr
 		obj.ConfirmBalance = tb.String()
 		obj.Balance = obj.ConfirmBalance
+		obj.UnconfirmBalance = "0"
 
 		addrBalanceArr = append(addrBalanceArr, obj)
 	}

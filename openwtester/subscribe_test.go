@@ -50,22 +50,22 @@ func (sub *subscriberSingle) BlockExtractDataNotify(sourceKey string, data *open
 
 	log.Std.Notice("data.Transaction: %+v", data.Transaction)
 
-	balance, err := sub.manager.GetAssetsAccountBalance(testApp, "", sourceKey)
-	if err != nil {
-		log.Errorf("GetAssetsAccountBalance failed, err: %v", err)
-	}
-
-	log.Std.Notice("balance: %s", balance.Balance)
-
-	if data.Transaction.Coin.IsContract {
-
-		balance, err := sub.manager.GetAssetsAccountTokenBalance(testApp, "", sourceKey, data.Transaction.Coin.Contract)
-		if err != nil {
-			log.Errorf("GetAssetsAccountTokenBalance failed, err: %v", err)
-		}
-
-		log.Std.Notice("%s balance: %s", balance.Contract.Token, balance.Balance.Balance)
-	}
+	//balance, err := sub.manager.GetAssetsAccountBalance(testApp, "", sourceKey)
+	//if err != nil {
+	//	log.Errorf("GetAssetsAccountBalance failed, err: %v", err)
+	//}
+	//
+	//log.Std.Notice("balance: %s", balance.Balance)
+	//
+	//if data.Transaction.Coin.IsContract {
+	//
+	//	balance, err := sub.manager.GetAssetsAccountTokenBalance(testApp, "", sourceKey, data.Transaction.Coin.Contract)
+	//	if err != nil {
+	//		log.Errorf("GetAssetsAccountTokenBalance failed, err: %v", err)
+	//	}
+	//
+	//	log.Std.Notice("%s balance: %s", balance.Contract.Token, balance.Balance.Balance)
+	//}
 
 	return nil
 }
@@ -136,6 +136,7 @@ func TestSubscribeScanBlock(t *testing.T) {
 		symbol     = "SERO"
 		addrs      = map[string]string{
 			"7EHTPNYhKNuULtwQEgFK3NuYbf3qAGNoowRHo5BHZij3mdB7WJxZ4oRJt91HbVL88pxDmBV159MsTjiwzRMD7FgqideToxcNK63VPU7LJ9ff37kJ38Yx41cSBXgdAhFRwJy": "2kfDs5Ptb1nybNnJx2TTBcRiWpmsb5wrzowQfhFjv4J8jEGSMxu7xxVSYAY32RGdefCbucDKPtiqJYjtrnksiiYL",
+			"DuxPidNrhmk7xPMaQvB4uaD8Sssqd2CX1DFvVLUcBcfR7F7VrU6cnXbWhQMfM1tuMN4HmDGCqpyjWLPTBcqnJicwuJMx7EwNDDvdTETpy6x6a5A5Bmok1Yh7SV5aJ6TwNWb": "3a1pFG4Sx8KfbSM6suDbgq4Eo8abt7gDra7GAjoHDA9SoMdA7ZAaZtCZhn3dA7xeBxbrPv7yyAzgT4PJS8Ti3rHY",
 		}
 	)
 
@@ -181,5 +182,5 @@ func TestSubscribeScanBlock(t *testing.T) {
 	sub := subscriberSingle{manager: tw}
 	scanner.AddObserver(&sub)
 
-	scanner.ScanBlock(1664944)
+	scanner.ScanBlock(1676931)
 }

@@ -137,7 +137,10 @@ func TestTransfer(t *testing.T) {
 		//"zxPiJnvqXCYgkSYfjPPg2y8EBbSTVE41We2Y3LxhaMMqzsr6i9vE8hS8kQAXw9DML3nMiwxqE9StWPVLC9ibQCbPfxWzBuM6VfvEtnLPKiDe9Kgo7Ap9ARKzUM1LKChcDM7",
 		//"zxtHrpvVY1nAMjBcKGV6fsjaLUn7thruPWHMr2ckRhW7ZUphgN9RbaUpnr5pu4t3xJEAEqhUcaVSztpFZS9f2Cr6nxr9dBvVUgRGA9czvMBWCmiWPYb8z1XSiruJQgWC5XL",
 
-		"7EHTPNYhKNuULtwQEgFK3NuYbf3qAGNoowRHo5BHZij3mdB7WJxZ4oRJt91HbVL88pxDmBV159MsTjiwzRMD7FgqideToxcNK63VPU7LJ9ff37kJ38Yx41cSBXgdAhFRwJy",
+		//"7EHTPNYhKNuULtwQEgFK3NuYbf3qAGNoowRHo5BHZij3mdB7WJxZ4oRJt91HbVL88pxDmBV159MsTjiwzRMD7FgqideToxcNK63VPU7LJ9ff37kJ38Yx41cSBXgdAhFRwJy",
+		//"DuxPidNrhmk7xPMaQvB4uaD8Sssqd2CX1DFvVLUcBcfR7F7VrU6cnXbWhQMfM1tuMN4HmDGCqpyjWLPTBcqnJicwuJMx7EwNDDvdTETpy6x6a5A5Bmok1Yh7SV5aJ6TwNWb",
+		//"Wg3whJaTb92comuDPNtUro4xTh6jQ8RvEGqp8WZoKJgGkT8U85cb725fJWtmb4UUqxnqHwJVgMn6dJq4vTQ9mfj7MbSvs12imr12ZcxWPhVnQStKU9doHmyZRpqjSTCMTmq",
+		"apF7TzSz4dsZN8su25ash3P9m4WPvpzEMEHQzcD5Ugt66Dro55nZAkTSTkT41eMFoTi62LMaZxSJtNayn15PhREGeWwossP1Yrct88PhjjqiF2vLbMFr8t44fxQAwGLrBBW",
 	}
 
 	walletID := "W3TuDqe8VShgyPcg2dw4FRrNQbmxxiGPTJ"
@@ -147,7 +150,7 @@ func TestTransfer(t *testing.T) {
 
 	for _, to := range targets {
 
-		rawTx, err := testCreateTransactionStep(tw, walletID, accountID, to, "0.012345", "", nil)
+		rawTx, err := testCreateTransactionStep(tw, walletID, accountID, to, "0.5", "", nil)
 		if err != nil {
 			return
 		}
@@ -192,7 +195,11 @@ func TestTransfer_Token(t *testing.T) {
 		//"zxPiJnvqXCYgkSYfjPPg2y8EBbSTVE41We2Y3LxhaMMqzsr6i9vE8hS8kQAXw9DML3nMiwxqE9StWPVLC9ibQCbPfxWzBuM6VfvEtnLPKiDe9Kgo7Ap9ARKzUM1LKChcDM7",
 		//"zxtHrpvVY1nAMjBcKGV6fsjaLUn7thruPWHMr2ckRhW7ZUphgN9RbaUpnr5pu4t3xJEAEqhUcaVSztpFZS9f2Cr6nxr9dBvVUgRGA9czvMBWCmiWPYb8z1XSiruJQgWC5XL",
 
-		"7EHTPNYhKNuULtwQEgFK3NuYbf3qAGNoowRHo5BHZij3mdB7WJxZ4oRJt91HbVL88pxDmBV159MsTjiwzRMD7FgqideToxcNK63VPU7LJ9ff37kJ38Yx41cSBXgdAhFRwJy",
+		//"7EHTPNYhKNuULtwQEgFK3NuYbf3qAGNoowRHo5BHZij3mdB7WJxZ4oRJt91HbVL88pxDmBV159MsTjiwzRMD7FgqideToxcNK63VPU7LJ9ff37kJ38Yx41cSBXgdAhFRwJy",
+
+		//"DuxPidNrhmk7xPMaQvB4uaD8Sssqd2CX1DFvVLUcBcfR7F7VrU6cnXbWhQMfM1tuMN4HmDGCqpyjWLPTBcqnJicwuJMx7EwNDDvdTETpy6x6a5A5Bmok1Yh7SV5aJ6TwNWb",
+		//"Wg3whJaTb92comuDPNtUro4xTh6jQ8RvEGqp8WZoKJgGkT8U85cb725fJWtmb4UUqxnqHwJVgMn6dJq4vTQ9mfj7MbSvs12imr12ZcxWPhVnQStKU9doHmyZRpqjSTCMTmq",
+		"apF7TzSz4dsZN8su25ash3P9m4WPvpzEMEHQzcD5Ugt66Dro55nZAkTSTkT41eMFoTi62LMaZxSJtNayn15PhREGeWwossP1Yrct88PhjjqiF2vLbMFr8t44fxQAwGLrBBW",
 	}
 
 	walletID := "W3TuDqe8VShgyPcg2dw4FRrNQbmxxiGPTJ"
@@ -212,7 +219,7 @@ func TestTransfer_Token(t *testing.T) {
 
 	for _, to := range targets {
 
-		rawTx, err := testCreateTransactionStep(tw, walletID, accountID, to, "0.01", "", &contract)
+		rawTx, err := testCreateTransactionStep(tw, walletID, accountID, to, "0.5", "", &contract)
 		if err != nil {
 			return
 		}

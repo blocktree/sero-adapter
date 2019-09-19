@@ -209,8 +209,8 @@ func TestWalletManager_ListUnspent(t *testing.T) {
 }
 
 func TestWalletManager_ListUnspentByAddress(t *testing.T) {
-	address := "7EHTPNYhKNuULtwQEgFK3NuYbf3qAGNoowRHo5BHZij3mdB7WJxZ4oRJt91HbVL88pxDmBV159MsTjiwzRMD7FgqideToxcNK63VPU7LJ9ff37kJ38Yx41cSBXgdAhFRwJy"
-	currency := "AIPP"
+	address := "DuxPidNrhmk7xPMaQvB4uaD8Sssqd2CX1DFvVLUcBcfR7F7VrU6cnXbWhQMfM1tuMN4HmDGCqpyjWLPTBcqnJicwuJMx7EwNDDvdTETpy6x6a5A5Bmok1Yh7SV5aJ6TwNWb"
+	currency := "SERO"
 	unspent, err := tw.ListUnspentByAddress(address, currency, 0, -1)
 	if err != nil {
 		t.Errorf("ListUnspent failed, error: %v", err)
